@@ -1,13 +1,1 @@
-{
-  "protein": {
-    "products": [
-      {"id": "p1", "type": "Сывороточный", "brand": "MyProtein", "name": "Impact Whey", "weight": 1000, "price": 3790, "protein": 78, "rating": 5},
-      {"id": "p2", "type": "Сывороточный", "brand": "Optimum Nutrition", "name": "Gold Standard", "weight": 2270, "price": 5490, "protein": 82, "rating": 5}
-    ]
-  },
-  "creatine": {
-    "products": [
-      {"id": "c1", "type": "Моногидрат", "brand": "MyProtein", "name": "Creatine", "weight": 500, "price": 1190, "protein": 0, "rating": 5}
-    ]
-  }
-}
+
