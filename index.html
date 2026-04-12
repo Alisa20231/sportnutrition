@@ -995,6 +995,7 @@ function saveChanges() {
     }
     
     localStorage.setItem('sportnutrition_database', JSON.stringify(database));
+    let retrievedData = localStorage.getItem('sportnutrition_database');
     alert("✅ Все изменения сохранены локально");
     updateStatus("Изменения сохранены в localStorage");
 }
