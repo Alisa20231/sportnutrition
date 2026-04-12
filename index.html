@@ -107,7 +107,11 @@
 <div id="addModal" class="modal">
     <div class="modal-content">
         <h3>➕ НОВЫЙ ПРОДУКТ</h3>
-        <input type="text" id="newName" placeholder="Название продукта *">
+        
+        <label>Название продукта *</label>
+        <input type="text" id="newName" placeholder="Пример: Impact Whey">
+        
+        <label>Категория</label>
         <select id="newCategory">
             <option value="Протеины">🥛 Протеины</option>
             <option value="Креатин">⚡ Креатин</option>
@@ -115,17 +119,40 @@
             <option value="Жиросжигатели">🔥 Жиросжигатели</option>
             <option value="Гейнеры">⚖️ Гейнеры</option>
         </select>
-        <input type="text" id="newType" placeholder="Тип" value="Сывороточный">
-        <input type="text" id="newBrand" placeholder="Бренд" value="MyProtein">
+        
+        <label>Тип продукта</label>
+        <input type="text" id="newType" placeholder="Сывороточный, Моногидрат, BCAA...">
+        
+        <label>Бренд</label>
+        <input type="text" id="newBrand" placeholder="MyProtein, Optimum Nutrition...">
+        
         <div class="form-row">
-            <input type="number" id="newWeight" placeholder="Вес (г)" value="1000">
-            <input type="number" id="newPrice" placeholder="Цена (₽)" value="3000">
+            <div style="flex:1">
+                <label>Вес (г)</label>
+                <input type="number" id="newWeight" placeholder="1000">
+            </div>
+            <div style="flex:1">
+                <label>Цена (₽)</label>
+                <input type="number" id="newPrice" placeholder="3000">
+            </div>
         </div>
+        
         <div class="form-row">
-            <input type="number" step="0.1" id="newProtein" placeholder="Белки /100г" value="70">
-            <input type="number" step="0.1" id="newFats" placeholder="Жиры /100г" value="5">
-            <input type="number" step="0.1" id="newCarbs" placeholder="Углеводы /100г" value="10">
+            <div style="flex:1">
+                <label>Белки (г/100г)</label>
+                <input type="number" step="0.1" id="newProtein" placeholder="70">
+            </div>
+            <div style="flex:1">
+                <label>Жиры (г/100г)</label>
+                <input type="number" step="0.1" id="newFats" placeholder="5">
+            </div>
+            <div style="flex:1">
+                <label>Углеводы (г/100г)</label>
+                <input type="number" step="0.1" id="newCarbs" placeholder="10">
+            </div>
         </div>
+        
+        <label>Рейтинг</label>
         <select id="newRating">
             <option value="5">⭐⭐⭐⭐⭐ Отлично</option>
             <option value="4">⭐⭐⭐⭐ Хорошо</option>
@@ -133,13 +160,13 @@
             <option value="2">⭐⭐ Плохо</option>
             <option value="1">⭐ Ужасно</option>
         </select>
+        
         <div class="modal-buttons">
             <button id="saveProductBtn">💾 СОХРАНИТЬ</button>
             <button id="closeModalBtn">❌ ОТМЕНА</button>
         </div>
     </div>
 </div>
-
 <script>
     // ==================== SUPABASE НАСТРОЙКИ (БЕЗ ДУБЛИРОВАНИЯ) ====================
     const SUPABASE_URL = "https://gfegddnmqtwamxlmxqba.supabase.co";
@@ -272,41 +299,45 @@
     
     // ДОБАВЛЕНИЕ ПРОДУКТА
     async function addProduct() {
-        if (!isAdmin) {
-            alert("Только администратор");
-            return;
-        }
-        
-        const name = document.getElementById('newName').value.trim();
-        if (!name) {
-            alert("Введите название");
-            return;
-        }
-        
-        const newProduct = {
-            name: name,
-            category: document.getElementById('newCategory').value,
-            type: document.getElementById('newType').value.trim() || "Не указан",
-            brand: document.getElementById('newBrand').value.trim() || "Не указан",
-            weight: parseInt(document.getElementById('newWeight').value) || 0,
-            price: parseInt(document.getElementById('newPrice').value) || 0,
-            protein: parseFloat(document.getElementById('newProtein').value) || 0,
-            fats: parseFloat(document.getElementById('newFats').value) || 0,
-            carbs: parseFloat(document.getElementById('newCarbs').value) || 0,
-            rating: parseInt(document.getElementById('newRating').value)
-        };
-        
-        const { error } = await supabaseClient.from('products').insert([newProduct]);
-        
-        if (error) {
-            alert("Ошибка: " + error.message);
-        } else {
-            alert("✅ Продукт добавлен!");
-            closeModal();
-            loadProducts();
-            clearForm();
-        }
+    if (!isAdmin) {
+        alert("Только администратор");
+        return;
     }
+    
+    const name = document.getElementById('newName').value.trim();
+    if (!name) {
+        alert("Введите название продукта!");
+        document.getElementById('newName').focus();
+        return;
+    }
+    
+    const newProduct = {
+        name: name,
+        category: document.getElementById('newCategory').value,
+        type: document.getElementById('newType').value.trim() || "Не указан",
+        brand: document.getElementById('newBrand').value.trim() || "Не указан",
+        weight: parseInt(document.getElementById('newWeight').value) || 0,
+        price: parseInt(document.getElementById('newPrice').value) || 0,
+        protein: parseFloat(document.getElementById('newProtein').value) || 0,
+        fats: parseFloat(document.getElementById('newFats').value) || 0,
+        carbs: parseFloat(document.getElementById('newCarbs').value) || 0,
+        rating: parseInt(document.getElementById('newRating').value)
+    };
+    
+    console.log("Отправляем продукт:", newProduct);
+    
+    const { data, error } = await supabaseClient.from('products').insert([newProduct]).select();
+    
+    if (error) {
+        alert("❌ Ошибка: " + error.message);
+        console.error(error);
+    } else {
+        alert("✅ Продукт добавлен!");
+        closeModal();
+        loadProducts();
+        clearForm();
+    }
+}
     
     // РЕДАКТИРОВАНИЕ
     async function editProduct(id) {
