@@ -256,9 +256,17 @@
     
     // АДМИН-ПАНЕЛЬ
     function toggleAdminPanel() {
-        const form = document.getElementById('adminForm');
-        form.style.display = form.style.display === 'block' ? 'none' : 'block';
+    const form = document.getElementById('adminForm');
+    if (form) {
+        if (form.style.display === 'none' || form.style.display === '') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
+    } else {
+        alert("Форма adminForm не найдена!");
     }
+}
     
     function loginAdmin() {
         const password = document.getElementById('adminPassword').value;
