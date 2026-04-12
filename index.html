@@ -45,6 +45,8 @@
         .modal-buttons button:first-child { background: #667eea; color: white; }
         .modal-buttons button:last-child { background: #ef4444; color: white; }
         .rating { color: #f59e0b; }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
     </style>
 </head>
 <body>
@@ -85,7 +87,7 @@
                     <tr><th>Название</th><th>Категория</th><th>Тип</th><th>Бренд</th><th>Вес(г)</th><th>Цена(₽)</th><th>Белки</th><th>Жиры</th><th>Углеводы</th><th>Рейтинг</th><th id="actionsHeader">Действия</th></tr>
                 </thead>
                 <tbody id="tableBody">
-                    <td><td colspan="11" style="text-align:center; padding:40px;">🔄 Загрузка...</td></tr>
+                    <tr><td colspan="11" style="text-align:center; padding:40px;">🔄 Загрузка...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -113,16 +115,16 @@
             <option value="Жиросжигатели">🔥 Жиросжигатели</option>
             <option value="Гейнеры">⚖️ Гейнеры</option>
         </select>
-        <input type="text" id="newType" placeholder="Тип">
-        <input type="text" id="newBrand" placeholder="Бренд">
+        <input type="text" id="newType" placeholder="Тип" value="Сывороточный">
+        <input type="text" id="newBrand" placeholder="Бренд" value="MyProtein">
         <div class="form-row">
-            <input type="number" id="newWeight" placeholder="Вес (г)">
-            <input type="number" id="newPrice" placeholder="Цена (₽)">
+            <input type="number" id="newWeight" placeholder="Вес (г)" value="1000">
+            <input type="number" id="newPrice" placeholder="Цена (₽)" value="3000">
         </div>
         <div class="form-row">
-            <input type="number" step="0.1" id="newProtein" placeholder="Белки /100г">
-            <input type="number" step="0.1" id="newFats" placeholder="Жиры /100г">
-            <input type="number" step="0.1" id="newCarbs" placeholder="Углеводы /100г">
+            <input type="number" step="0.1" id="newProtein" placeholder="Белки /100г" value="70">
+            <input type="number" step="0.1" id="newFats" placeholder="Жиры /100г" value="5">
+            <input type="number" step="0.1" id="newCarbs" placeholder="Углеводы /100г" value="10">
         </div>
         <select id="newRating">
             <option value="5">⭐⭐⭐⭐⭐ Отлично</option>
@@ -151,26 +153,26 @@
     try {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log("✅ Supabase подключен");
+        document.getElementById('statusText').innerHTML = '🔄 Подключено к облаку...';
     } catch(e) {
         console.log("❌ Ошибка:", e);
-        document.getElementById('statusText').innerHTML = '❌ Ошибка подключения к Supabase';
+        document.getElementById('statusText').innerHTML = '❌ Ошибка подключения';
     }
     
-    // ЗАГРУЗКА ДАННЫХ
+    // ЗАГРУЗКА ДАННЫХ ИЗ SUPABASE
     async function loadProducts() {
-        if (!supabase) {
-            document.getElementById('statusText').innerHTML = '⚠️ Ошибка подключения';
-            return;
-        }
+        if (!supabase) return;
         
-        document.getElementById('statusText').innerHTML = '🔄 Загрузка из Supabase...';
+        document.getElementById('statusText').innerHTML = '🔄 Загрузка из облака...';
         
-        const { data, error } = await supabase.from('products').select('*').order('id', { ascending: false });
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .order('id', { ascending: false });
         
         if (error) {
             console.log("❌ Ошибка:", error);
             document.getElementById('statusText').innerHTML = '❌ Ошибка: ' + error.message;
-            // Если таблицы нет, создаём пустой массив
             allProducts = [];
             displayProducts();
         } else {
@@ -178,7 +180,7 @@
             console.log("✅ Загружено:", allProducts.length);
             updateFilters();
             displayProducts();
-            document.getElementById('statusText').innerHTML = `✅ Загружено ${allProducts.length} продуктов`;
+            document.getElementById('statusText').innerHTML = `✅ Загружено ${allProducts.length} продуктов из облака`;
             document.getElementById('productCount').textContent = allProducts.length;
         }
     }
@@ -242,7 +244,7 @@
     
     function filterData() { displayProducts(); }
     
-    // ==================== АДМИН-ПАНЕЛЬ ====================
+    // ==================== АДМИН-ПАНЕЛЬ (РАБОТАЕТ!) ====================
     function toggleAdminPanel() {
         const form = document.getElementById('adminForm');
         if (form.style.display === 'none' || form.style.display === '') {
@@ -258,8 +260,7 @@
         if (password === "admin123") {
             isAdmin = true;
             document.getElementById('adminForm').style.display = 'none';
-            const addBtn = document.getElementById('addBtn');
-            if (addBtn) addBtn.style.display = 'inline-block';
+            document.getElementById('addBtn').style.display = 'inline-block';
             document.getElementById('adminPassword').value = '';
             
             alert("✅ Вы вошли как администратор!");
@@ -272,12 +273,18 @@
         }
     }
     
-    // ДОБАВЛЕНИЕ ПРОДУКТА
+    // ДОБАВЛЕНИЕ ПРОДУКТА В SUPABASE
     async function addProduct() {
-        if (!isAdmin) { alert("Только администратор"); return; }
+        if (!isAdmin) {
+            alert("Только администратор");
+            return;
+        }
         
         const name = document.getElementById('newName').value.trim();
-        if (!name) { alert("Введите название"); return; }
+        if (!name) {
+            alert("Введите название продукта");
+            return;
+        }
         
         const newProduct = {
             name: name,
@@ -292,14 +299,17 @@
             rating: parseInt(document.getElementById('newRating').value)
         };
         
+        document.getElementById('statusText').innerHTML = '💾 Сохранение в облако...';
+        
         const { error } = await supabase.from('products').insert([newProduct]);
         
         if (error) {
-            alert("Ошибка: " + error.message);
+            alert("❌ Ошибка: " + error.message);
+            document.getElementById('statusText').innerHTML = '❌ Ошибка сохранения';
         } else {
-            alert("✅ Продукт добавлен!");
+            alert("✅ Продукт добавлен в облако!");
             closeModal();
-            loadProducts();
+            await loadProducts();
             clearForm();
         }
     }
@@ -307,22 +317,30 @@
     // РЕДАКТИРОВАНИЕ
     async function editProduct(id) {
         if (!isAdmin) return;
-        const newName = prompt("Новое название:");
+        const newName = prompt("Введите новое название:");
         if (!newName) return;
         
         const { error } = await supabase.from('products').update({ name: newName }).eq('id', id);
-        if (error) alert("Ошибка: " + error.message);
-        else { alert("✅ Изменено"); loadProducts(); }
+        if (error) {
+            alert("Ошибка: " + error.message);
+        } else {
+            alert("✅ Изменено в облаке!");
+            await loadProducts();
+        }
     }
     
     // УДАЛЕНИЕ
     async function deleteProduct(id) {
         if (!isAdmin) return;
-        if (!confirm("Удалить?")) return;
+        if (!confirm("Удалить этот продукт?")) return;
         
         const { error } = await supabase.from('products').delete().eq('id', id);
-        if (error) alert("Ошибка: " + error.message);
-        else { alert("✅ Удалено"); loadProducts(); }
+        if (error) {
+            alert("Ошибка: " + error.message);
+        } else {
+            alert("✅ Удалено из облака!");
+            await loadProducts();
+        }
     }
     
     function showAddForm() { 
@@ -336,13 +354,13 @@
     
     function clearForm() {
         document.getElementById('newName').value = '';
-        document.getElementById('newType').value = '';
-        document.getElementById('newBrand').value = '';
-        document.getElementById('newWeight').value = '';
-        document.getElementById('newPrice').value = '';
-        document.getElementById('newProtein').value = '';
-        document.getElementById('newFats').value = '';
-        document.getElementById('newCarbs').value = '';
+        document.getElementById('newType').value = 'Сывороточный';
+        document.getElementById('newBrand').value = 'MyProtein';
+        document.getElementById('newWeight').value = '1000';
+        document.getElementById('newPrice').value = '3000';
+        document.getElementById('newProtein').value = '70';
+        document.getElementById('newFats').value = '5';
+        document.getElementById('newCarbs').value = '10';
     }
     
     function refreshData() { loadProducts(); }
