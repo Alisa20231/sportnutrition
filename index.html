@@ -50,16 +50,6 @@
 <body>
 <div class="container">
     <div class="header">
-        <div class="admin-panel">
-            <button class="admin-toggle" id="adminToggleBtn">🔑 Админ-панель</button>
-            <div class="admin-form" id="adminForm" style="display:none;">
-                <h3>🔐 Вход администратора</h3>
-                <input type="password" id="adminPassword" placeholder="Введите пароль">
-                <button id="loginBtn">Войти</button>
-            </div>
-        </div>
-
-
         <h1>🏋️‍♂️ БАЗА ДАННЫХ СПОРТИВНОГО ПИТАНИЯ</h1>
         <div class="admin-panel">
             <button class="admin-toggle" id="adminToggleBtn">🔑 Админ-панель</button>
@@ -95,7 +85,7 @@
                     <tr><th>Название</th><th>Категория</th><th>Тип</th><th>Бренд</th><th>Вес(г)</th><th>Цена(₽)</th><th>Белки</th><th>Жиры</th><th>Углеводы</th><th>Рейтинг</th><th id="actionsHeader">Действия</th></tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr><td colspan="11" style="text-align:center; padding:40px;">🔄 Загрузка...</td></tr>
+                    <td><td colspan="11" style="text-align:center; padding:40px;">🔄 Загрузка...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -149,7 +139,7 @@
 </div>
 
 <script>
-    // ==================== ВАШИ ДАННЫЕ ИЗ SUPABASE ====================
+    // ==================== SUPABASE НАСТРОЙКИ ====================
     const SUPABASE_URL = "https://gfegddnmqtwamxlmxqba.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_BQm4AqGZgqOQ5WLe26UR-g_BtES9KtI";
     
@@ -180,6 +170,9 @@
         if (error) {
             console.log("❌ Ошибка:", error);
             document.getElementById('statusText').innerHTML = '❌ Ошибка: ' + error.message;
+            // Если таблицы нет, создаём пустой массив
+            allProducts = [];
+            displayProducts();
         } else {
             allProducts = data || [];
             console.log("✅ Загружено:", allProducts.length);
@@ -250,47 +243,36 @@
     function filterData() { displayProducts(); }
     
     // ==================== АДМИН-ПАНЕЛЬ ====================
-let isAdmin = false;
-
-function toggleAdminPanel() {
-    const form = document.getElementById('adminForm');
-    if (form.style.display === 'none' || form.style.display === '') {
-        form.style.display = 'block';
-    } else {
-        form.style.display = 'none';
+    function toggleAdminPanel() {
+        const form = document.getElementById('adminForm');
+        if (form.style.display === 'none' || form.style.display === '') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
     }
-}
-
-function loginAdmin() {
-    const password = document.getElementById('adminPassword').value;
     
-    if (password === "admin123") {
-        isAdmin = true;
-        document.getElementById('adminForm').style.display = 'none';
-        const addBtn = document.getElementById('addBtn');
-        if (addBtn) addBtn.style.display = 'inline-block';
-        document.getElementById('adminPassword').value = '';
+    function loginAdmin() {
+        const password = document.getElementById('adminPassword').value;
         
-        // Показываем кнопки действий в таблице
-        document.querySelectorAll('.delete-btn, .edit-btn').forEach(btn => {
-            btn.style.display = 'inline-block';
-        });
-        
-        alert("✅ Вы вошли как администратор!");
-        document.getElementById('statusText').innerHTML = "✅ Режим администратора активен";
-        
-        // Обновляем таблицу, чтобы показать кнопки действий
-        if (typeof displayProducts === 'function') displayProducts();
-    } else {
-        alert("❌ Неверный пароль! Пароль: admin123");
-        document.getElementById('adminPassword').value = '';
+        if (password === "admin123") {
+            isAdmin = true;
+            document.getElementById('adminForm').style.display = 'none';
+            const addBtn = document.getElementById('addBtn');
+            if (addBtn) addBtn.style.display = 'inline-block';
+            document.getElementById('adminPassword').value = '';
+            
+            alert("✅ Вы вошли как администратор!");
+            document.getElementById('statusText').innerHTML = "✅ Режим администратора активен";
+            
+            displayProducts();
+        } else {
+            alert("❌ Неверный пароль! Пароль: admin123");
+            document.getElementById('adminPassword').value = '';
+        }
     }
-}
-
-document.getElementById('adminToggleBtn').onclick = toggleAdminPanel;
-document.getElementById('loginBtn').onclick = loginAdmin;
     
-    // ДОБАВЛЕНИЕ
+    // ДОБАВЛЕНИЕ ПРОДУКТА
     async function addProduct() {
         if (!isAdmin) { alert("Только администратор"); return; }
         
@@ -343,8 +325,15 @@ document.getElementById('loginBtn').onclick = loginAdmin;
         else { alert("✅ Удалено"); loadProducts(); }
     }
     
-    function showAddForm() { document.getElementById('addModal').style.display = 'flex'; clearForm(); }
-    function closeModal() { document.getElementById('addModal').style.display = 'none'; }
+    function showAddForm() { 
+        document.getElementById('addModal').style.display = 'flex'; 
+        clearForm();
+    }
+    
+    function closeModal() { 
+        document.getElementById('addModal').style.display = 'none'; 
+    }
+    
     function clearForm() {
         document.getElementById('newName').value = '';
         document.getElementById('newType').value = '';
@@ -355,6 +344,7 @@ document.getElementById('loginBtn').onclick = loginAdmin;
         document.getElementById('newFats').value = '';
         document.getElementById('newCarbs').value = '';
     }
+    
     function refreshData() { loadProducts(); }
     
     // НАЗНАЧЕНИЕ ОБРАБОТЧИКОВ
