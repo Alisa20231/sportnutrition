@@ -365,6 +365,79 @@
     window.onclick = function(event) {
         if (event.target === document.getElementById('addModal')) closeModal();
     };
+    // ==================== ЭКСПОРТ В EXCEL ====================
+function exportToExcel() {
+    if (allProducts.length === 0) {
+        alert("Нет данных для экспорта");
+        return;
+    }
+    
+    let csv = "\uFEFFНазвание;Категория;Тип;Бренд;Вес(г);Цена(₽);Белки(г);Жиры(г);Углеводы(г);Рейтинг\n";
+    
+    allProducts.forEach(p => {
+        csv += `${p.name};${p.category};${p.type};${p.brand};${p.weight};${p.price};${p.protein};${p.fats};${p.carbs};${p.rating}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `sportnutrition_${new Date().toISOString().slice(0,10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(link);
+    alert("✅ Данные выгружены в CSV");
+}
+
+// ==================== ИМПОРТ ИЗ EXCEL ====================
+function importFromExcel() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    input.onchange = async function(e) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = async function(event) {
+            const csv = event.target.result;
+            const lines = csv.split('\n');
+            
+            let newProducts = [];
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(';');
+                if (cols.length >= 9 && cols[0].trim()) {
+                    newProducts.push({
+                        name: cols[0].trim(),
+                        category: cols[1].trim() || "Протеины",
+                        type: cols[2].trim() || "Не указан",
+                        brand: cols[3].trim() || "Не указан",
+                        weight: parseInt(cols[4]) || 0,
+                        price: parseInt(cols[5]) || 0,
+                        protein: parseFloat(cols[6]) || 0,
+                        fats: parseFloat(cols[7]) || 0,
+                        carbs: parseFloat(cols[8]) || 0,
+                        rating: parseInt(cols[9]) || 5
+                    });
+                }
+            }
+            
+            if (newProducts.length === 0) {
+                alert("Файл не содержит данных");
+                return;
+            }
+            
+            for (const product of newProducts) {
+                await supabaseClient.from('products').insert([product]);
+            }
+            
+            alert(`✅ Импортировано ${newProducts.length} продуктов!`);
+            loadProducts();
+        };
+        reader.readAsText(file, 'UTF-8');
+    };
+    input.click();
+}
+
+// НАЗНАЧЕНИЕ КНОПОК
+document.getElementById('exportExcelBtn').onclick = exportToExcel;
+document.getElementById('importExcelBtn').onclick = importFromExcel;
     
     // ЗАПУСК
     loadProducts();
