@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Спортивное питание | База данных</title>
+    <!-- ПОДКЛЮЧЕНИЕ SUPABASE - ОБЯЗАТЕЛЬНО! -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
@@ -138,34 +140,34 @@
 </div>
 
 <script>
-    // ==================== SUPABASE НАСТРОЙКИ ====================
+    // ==================== ВАШИ ДАННЫЕ ИЗ SUPABASE ====================
     const SUPABASE_URL = "https://gfegddnmqtwamxlmxqba.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_BQm4AqGZgqOQ5WLe26UR-g_BtES9KtI";
     
-    // ПЕРЕМЕННЫЕ (ТОЛЬКО ОДИН РАЗ!)
-    let supabaseClient = null;
+    let supabase = null;
     let isAdmin = false;
     let allProducts = [];
     
-    // ПОДКЛЮЧЕНИЕ К SUPABASE
-    try {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ПРОВЕРЯЕМ, ЧТО SUPABASE ЗАГРУЗИЛСЯ
+    if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log("✅ Supabase подключен");
-    } catch(e) {
-        console.log("❌ Ошибка:", e);
-        document.getElementById('statusText').innerHTML = '❌ Ошибка подключения к Supabase';
+        document.getElementById('statusText').innerHTML = '🔄 Подключено к облаку...';
+    } else {
+        console.log("❌ Supabase не загрузился");
+        document.getElementById('statusText').innerHTML = '❌ Ошибка: Supabase не загрузился. Проверьте интернет.';
     }
     
     // ЗАГРУЗКА ДАННЫХ
     async function loadProducts() {
-        if (!supabaseClient) {
-            document.getElementById('statusText').innerHTML = '⚠️ Ошибка подключения';
+        if (!supabase) {
+            document.getElementById('statusText').innerHTML = '⚠️ Ошибка подключения к Supabase';
             return;
         }
         
-        document.getElementById('statusText').innerHTML = '🔄 Загрузка из Supabase...';
+        document.getElementById('statusText').innerHTML = '🔄 Загрузка из облака...';
         
-        const { data, error } = await supabaseClient.from('products').select('*').order('id', { ascending: false });
+        const { data, error } = await supabase.from('products').select('*').order('id', { ascending: false });
         
         if (error) {
             console.log("❌ Ошибка:", error);
@@ -177,7 +179,7 @@
             console.log("✅ Загружено:", allProducts.length);
             updateFilters();
             displayProducts();
-            document.getElementById('statusText').innerHTML = `✅ Загружено ${allProducts.length} продуктов`;
+            document.getElementById('statusText').innerHTML = `✅ Загружено ${allProducts.length} продуктов из облака`;
             document.getElementById('productCount').textContent = allProducts.length;
         }
     }
@@ -279,7 +281,7 @@
         
         const name = document.getElementById('newName').value.trim();
         if (!name) {
-            alert("Введите название");
+            alert("Введите название продукта");
             return;
         }
         
@@ -296,14 +298,17 @@
             rating: parseInt(document.getElementById('newRating').value)
         };
         
-        const { error } = await supabaseClient.from('products').insert([newProduct]);
+        document.getElementById('statusText').innerHTML = '💾 Сохранение в облако...';
+        
+        const { error } = await supabase.from('products').insert([newProduct]);
         
         if (error) {
-            alert("Ошибка: " + error.message);
+            alert("❌ Ошибка: " + error.message);
+            document.getElementById('statusText').innerHTML = '❌ Ошибка сохранения';
         } else {
-            alert("✅ Продукт добавлен!");
+            alert("✅ Продукт добавлен в облако!");
             closeModal();
-            loadProducts();
+            await loadProducts();
             clearForm();
         }
     }
@@ -314,7 +319,7 @@
         const newName = prompt("Введите новое название:");
         if (!newName) return;
         
-        const { error } = await supabaseClient.from('products').update({ name: newName }).eq('id', id);
+        const { error } = await supabase.from('products').update({ name: newName }).eq('id', id);
         if (error) alert("Ошибка: " + error.message);
         else { alert("✅ Изменено"); loadProducts(); }
     }
@@ -322,11 +327,11 @@
     // УДАЛЕНИЕ
     async function deleteProduct(id) {
         if (!isAdmin) return;
-        if (!confirm("Удалить?")) return;
+        if (!confirm("Удалить этот продукт?")) return;
         
-        const { error } = await supabaseClient.from('products').delete().eq('id', id);
+        const { error } = await supabase.from('products').delete().eq('id', id);
         if (error) alert("Ошибка: " + error.message);
-        else { alert("✅ Удалено"); loadProducts(); }
+        else { alert("✅ Удалено из облака"); loadProducts(); }
     }
     
     function showAddForm() { 
