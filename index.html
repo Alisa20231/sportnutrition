@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Спортивное питание | База данных</title>
+    <title>Спортивное питание | Полная база данных</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; }
         .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; position: relative; }
         .header h1 { font-size: 1.8em; }
         .admin-panel { position: absolute; top: 20px; right: 20px; }
@@ -18,30 +18,37 @@
         .admin-form button { background: #667eea; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; width: 100%; }
         .content { padding: 30px; }
         .filter-bar { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-        .filter-bar select { flex: 1; min-width: 150px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; cursor: pointer; background: white; }
+        .filter-bar select { flex: 1; min-width: 180px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; cursor: pointer; background: white; font-size: 14px; }
+        .filter-bar select:focus { outline: none; border-color: #667eea; }
         .table-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #667eea; color: white; padding: 12px; text-align: left; }
-        td { padding: 10px; border-bottom: 1px solid #ddd; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th { background: #667eea; color: white; padding: 12px 8px; text-align: left; position: sticky; top: 0; }
+        td { padding: 10px 8px; border-bottom: 1px solid #ddd; }
         tr:hover { background: #f5f5f5; }
-        .status-bar { background: #f8f9fa; padding: 15px; border-radius: 12px; margin: 20px 0; display: flex; justify-content: space-between; }
-        .product-count { background: #667eea; color: white; padding: 5px 15px; border-radius: 20px; }
+        .status-bar { background: #f8f9fa; padding: 15px; border-radius: 12px; margin: 20px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .product-count { background: #667eea; color: white; padding: 5px 15px; border-radius: 20px; font-weight: 600; }
         .actions { display: flex; gap: 15px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
         .btn { padding: 12px 24px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
         .btn-primary { background: #667eea; color: white; }
-        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-primary:hover { transform: translateY(-2px); background: #5a67d8; }
         .btn-success { background: #10b981; color: white; }
-        .edit-btn, .delete-btn { padding: 5px 10px; margin: 0 3px; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-success:hover { transform: translateY(-2px); background: #059669; }
+        .edit-btn, .delete-btn { padding: 5px 10px; margin: 0 3px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; }
         .edit-btn { background: #f59e0b; color: white; }
         .delete-btn { background: #ef4444; color: white; }
-        @media (max-width: 768px) { th, td { font-size: 12px; padding: 6px; } .filter-bar select { font-size: 12px; } }
+        @media (max-width: 768px) { th, td { font-size: 11px; padding: 6px; } .filter-bar select { font-size: 12px; min-width: 120px; } .btn { padding: 8px 16px; font-size: 12px; } }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 500px; max-width: 90%; }
-        .modal-content input, .modal-content select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 550px; max-width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-content h3 { margin-bottom: 20px; color: #333; }
+        .modal-content input, .modal-content select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .modal-content input:focus, .modal-content select:focus { outline: none; border-color: #667eea; }
+        .form-row { display: flex; gap: 10px; }
+        .form-row input { flex: 1; }
         .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
         .modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
         .modal-buttons button:first-child { background: #667eea; color: white; }
         .modal-buttons button:last-child { background: #ef4444; color: white; }
+        .rating { color: #f59e0b; }
     </style>
 </head>
 <body>
@@ -64,8 +71,8 @@
                 <option value="">📁 Все категории</option>
                 <option value="Протеины">🥛 Протеины</option>
                 <option value="Креатин">⚡ Креатин</option>
-                <option value="BCAA">🔗 BCAA / Аминокислоты</option>
-                <option value="L-Карнитин">🔥 L-Карнитин</option>
+                <option value="Аминокислоты">🔗 Аминокислоты</option>
+                <option value="Жиросжигатели">🔥 Жиросжигатели</option>
                 <option value="Гейнеры">⚖️ Гейнеры</option>
             </select>
             <select id="typeFilter" onchange="filterData()">
@@ -79,7 +86,7 @@
         <div class="table-container">
             <table id="dataTable">
                 <thead id="tableHeaders">
-                    <tr><th>Название</th><th>Категория</th><th>Тип</th><th>Бренд</th><th>Вес(г)</th><th>Цена(₽)</th><th>Белок</th><th>Рейтинг</th><th>Действия</th></tr>
+                    <tr><th>Название</th><th>Категория</th><th>Тип</th><th>Бренд</th><th>Вес(г)</th><th>Цена(₽)</th><th>Белки/100г</th><th>Жиры/100г</th><th>Углеводы/100г</th><th>Рейтинг</th><th>Действия</th></tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
             </table>
@@ -97,24 +104,32 @@
     </div>
 </div>
 
+<!-- Модальное окно добавления -->
 <div id="addModal" class="modal">
     <div class="modal-content">
-        <h3>➕ НОВЫЙ ПРОДУКТ</h3>
-        <input type="text" id="newName" placeholder="Название *">
+        <h3>➕ ДОБАВИТЬ НОВЫЙ ПРОДУКТ</h3>
+        <input type="text" id="newName" placeholder="Название продукта *">
+        
         <select id="newCategory">
             <option value="Протеины">🥛 Протеины</option>
             <option value="Креатин">⚡ Креатин</option>
-            <option value="BCAA">🔗 BCAA / Аминокислоты</option>
-            <option value="L-Карнитин">🔥 L-Карнитин</option>
+            <option value="Аминокислоты">🔗 Аминокислоты</option>
+            <option value="Жиросжигатели">🔥 Жиросжигатели</option>
             <option value="Гейнеры">⚖️ Гейнеры</option>
         </select>
-        <input type="text" id="newType" placeholder="Тип (Сывороточный, Моногидрат...)">
+        
+        <select id="newType"></select>
         <input type="text" id="newBrand" placeholder="Бренд">
-        <div style="display: flex; gap: 10px;">
-            <input type="number" id="newWeight" placeholder="Вес (г)" style="flex:1">
-            <input type="number" id="newPrice" placeholder="Цена (₽)" style="flex:1">
+        
+        <div class="form-row">
+            <input type="number" id="newWeight" placeholder="Вес (г)">
+            <input type="number" id="newPrice" placeholder="Цена (₽)">
         </div>
-        <input type="number" id="newProtein" placeholder="Белок на 100г">
+        <div class="form-row">
+            <input type="number" id="newProtein" step="0.1" placeholder="Белки /100г">
+            <input type="number" id="newFats" step="0.1" placeholder="Жиры /100г">
+            <input type="number" id="newCarbs" step="0.1" placeholder="Углеводы /100г">
+        </div>
         <select id="newRating">
             <option value="5">⭐⭐⭐⭐⭐ Отлично</option>
             <option value="4">⭐⭐⭐⭐ Хорошо</option>
@@ -122,6 +137,7 @@
             <option value="2">⭐⭐ Плохо</option>
             <option value="1">⭐ Ужасно</option>
         </select>
+        
         <div class="modal-buttons">
             <button onclick="addProduct()">💾 СОХРАНИТЬ</button>
             <button onclick="closeModal()">❌ ОТМЕНА</button>
@@ -130,8 +146,20 @@
 </div>
 
 <script>
-    const SUPABASE_URL = "https://gfegddnmqtwamxlmxqba.supabase.co"; 
-    const SUPABASE_ANON_KEY = "sb_secret_ngxwGfdugdYfHnUxwIvZMg_WENVULVr";  
+
+    const SUPABASE_URL = "https://gfegddnmqtwamxlmxqba.supabase.co";   
+    const SUPABASE_ANON_KEY = "sb_publishable_BQm4AqGZgqOQ5WLe26UR-g_BtES9KtI";           
+    
+    // ВСЕ ТИПЫ ПО КАТЕГОРИЯМ
+    const typesByCategory = {
+        "Протеины": ["Сывороточный", "Казеиновый", "Соевый", "Яичный", "Говяжий", "Растительный", "Изолят сывороточного", "Гидролизат"],
+        "Креатин": ["Моногидрат", "Гидрохлорид", "Этиловый эфир", "Креалкалин", "Магниевый", "Жидкий креатин"],
+        "Аминокислоты": ["Незаменимые (EAA)", "Полузаменимые", "Заменимые", "BCAA 2:1:1", "BCAA 4:1:1", "Глютамин", "Аргинин", "Цитруллин", "Таурин", "Бета-аланин", "Лизин", "Метионин", "Треонин", "Фенилаланин", "Триптофан"],
+        "Жиросжигатели": ["Термогеники", "Липотропики", "Блокаторы калорий", "Тиреоидные", "Стимуляторные", "Нестимуляторные", "Блокаторы углеводов", "Блокаторы жиров"],
+        "Гейнеры": ["Высокоуглеводные", "Высокобелковые", "Сбалансированные", "Медленные", "Быстрые", "Среднекалорийные"]
+    };
+    
+    const brands = ["MyProtein", "Optimum Nutrition", "RPS", "Dymatize", "BSN", "Scitec Nutrition", "BioTech USA", "MuscleTech", "Universal Nutrition", "NOW Foods", "Solgar", "C4", "JYM", "GeneticLab", "Maxler", "Power System", "PureProtein", "Creapure", "Hydroxycut", "Lipo-6", "Animal Cuts", "Serious Mass", "Pro Complex"];
     
     let supabase;
     let isAdmin = false;
@@ -140,11 +168,13 @@
     try {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     } catch(e) {
-        document.getElementById('statusText').innerHTML = '❌ Ошибка подключения';
+        document.getElementById('statusText').innerHTML = '❌ Ошибка подключения к Supabase';
     }
     
+    // ЗАГРУЗКА ПРОДУКТОВ
     async function loadProducts() {
         if (!supabase) return;
+        document.getElementById('statusText').innerHTML = '🔄 Загрузка...';
         const { data, error } = await supabase.from('products').select('*').order('id', { ascending: false });
         if (error) {
             document.getElementById('statusText').innerHTML = '❌ Ошибка: ' + error.message;
@@ -152,15 +182,16 @@
             allProducts = data;
             updateFilters();
             displayProducts(data);
-            document.getElementById('statusText').innerHTML = `✅ ${data.length} продуктов`;
+            document.getElementById('statusText').innerHTML = `✅ Загружено ${data.length} продуктов`;
             document.getElementById('productCount').textContent = data.length;
         }
     }
     
+    // ОБНОВЛЕНИЕ ФИЛЬТРОВ
     function updateFilters() {
         const types = new Set();
-        const brands = new Set();
-        allProducts.forEach(p => { if(p.type) types.add(p.type); if(p.brand) brands.add(p.brand); });
+        const brandsSet = new Set();
+        allProducts.forEach(p => { if(p.type) types.add(p.type); if(p.brand) brandsSet.add(p.brand); });
         
         const typeSelect = document.getElementById('typeFilter');
         typeSelect.innerHTML = '<option value="">📋 Все типы</option>';
@@ -168,9 +199,10 @@
         
         const brandSelect = document.getElementById('brandFilter');
         brandSelect.innerHTML = '<option value="">🏷️ Все бренды</option>';
-        Array.from(brands).sort().forEach(b => brandSelect.innerHTML += `<option value="${b}">${b}</option>`);
+        Array.from(brandsSet).sort().forEach(b => brandSelect.innerHTML += `<option value="${b}">${b}</option>`);
     }
     
+    // ФИЛЬТРАЦИЯ
     function filterData() {
         let filtered = allProducts;
         const category = document.getElementById('categoryFilter').value;
@@ -183,14 +215,17 @@
         document.getElementById('productCount').textContent = filtered.length;
     }
     
+    // ОТОБРАЖЕНИЕ ТАБЛИЦЫ
     function displayProducts(products) {
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
         if (products.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:40px;">📭 Нет продуктов</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:40px;">📭 Нет продуктов. Администратор может добавить.</td></tr>';
             return;
         }
         products.forEach(p => {
+            const ratingStars = '⭐'.repeat(p.rating || 5);
+            const actions = isAdmin ? `<button class="edit-btn" onclick="editProduct(${p.id})">✏️</button> <button class="delete-btn" onclick="deleteProduct(${p.id})">🗑️</button>` : '';
             tbody.innerHTML += `<tr>
                 <td>${p.name || ''}</td>
                 <td>${p.category || ''}</td>
@@ -198,13 +233,28 @@
                 <td>${p.brand || ''}</td>
                 <td>${p.weight || ''}</td>
                 <td>${p.price || ''}</td>
-                <td>${p.protein || ''}</td>
-                <td>${'⭐'.repeat(p.rating || 5)}</td>
-                <td>${isAdmin ? `<button class="edit-btn" onclick="editProduct(${p.id})">✏️</button> <button class="delete-btn" onclick="deleteProduct(${p.id})">🗑️</button>` : ''}</td>
+                <td>${p.protein || 0} g</td>
+                <td>${p.fats || 0} g</td>
+                <td>${p.carbs || 0} g</td>
+                <td class="rating">${ratingStars}</td>
+                <td>${actions}</td>
             </tr>`;
         });
     }
     
+    // ОБНОВЛЕНИЕ ТИПОВ В ФОРМЕ
+    function updateTypeOptions() {
+        const category = document.getElementById('newCategory').value;
+        const typeSelect = document.getElementById('newType');
+        typeSelect.innerHTML = '<option value="">-- Выберите тип --</option>';
+        if (typesByCategory[category]) {
+            typesByCategory[category].forEach(type => {
+                typeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+            });
+        }
+    }
+    
+    // АДМИН-ПАНЕЛЬ
     function toggleAdminPanel() {
         const form = document.getElementById('adminForm');
         form.style.display = form.style.display === 'block' ? 'none' : 'block';
@@ -225,6 +275,7 @@
     
     function showAddForm() {
         document.getElementById('addModal').style.display = 'flex';
+        updateTypeOptions();
     }
     
     function closeModal() {
@@ -240,32 +291,36 @@
             brand: document.getElementById('newBrand').value,
             weight: parseInt(document.getElementById('newWeight').value) || 0,
             price: parseInt(document.getElementById('newPrice').value) || 0,
-            protein: parseInt(document.getElementById('newProtein').value) || 0,
+            protein: parseFloat(document.getElementById('newProtein').value) || 0,
+            fats: parseFloat(document.getElementById('newFats').value) || 0,
+            carbs: parseFloat(document.getElementById('newCarbs').value) || 0,
             rating: parseInt(document.getElementById('newRating').value)
         };
-        if (!product.name) { alert("Введите название"); return; }
+        if (!product.name) { alert("Введите название продукта"); return; }
+        if (!product.type) { alert("Выберите тип продукта"); return; }
         const { error } = await supabase.from('products').insert([product]);
         if (error) { alert("Ошибка: " + error.message); }
-        else { alert("✅ Добавлено!"); closeModal(); loadProducts(); }
+        else { alert("✅ Продукт добавлен!"); closeModal(); loadProducts(); }
     }
     
     async function deleteProduct(id) {
         if (!isAdmin) return;
-        if (!confirm("Удалить?")) return;
+        if (!confirm("Удалить этот продукт?")) return;
         const { error } = await supabase.from('products').delete().eq('id', id);
         if (error) alert("Ошибка: " + error.message);
-        else { alert("✅ Удалено"); loadProducts(); }
+        else { alert("✅ Продукт удалён"); loadProducts(); }
     }
     
     async function editProduct(id) {
         if (!isAdmin) return;
-        const newName = prompt("Новое название:");
+        const newName = prompt("Введите новое название:");
         if (!newName) return;
         const { error } = await supabase.from('products').update({ name: newName }).eq('id', id);
         if (error) alert("Ошибка: " + error.message);
         else { alert("✅ Изменено"); loadProducts(); }
     }
     
+    document.getElementById('newCategory').addEventListener('change', updateTypeOptions);
     loadProducts();
 </script>
 </body>
