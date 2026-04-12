@@ -374,7 +374,6 @@
             
             <div class="actions">
                 <button class="btn btn-primary" id="addBtn" style="display:none;" onclick="addProduct()">➕ Добавить продукт</button>
-                <button class="btn btn-success" id="syncBtn" style="display:none;" onclick="syncToCloud()">☁️ Синхронизировать</button>
                 <button class="btn" onclick="resetForm()">🔄 Сбросить форму</button>
                 <button class="btn" onclick="exportToExcel()">📊 Экспорт в Excel</button>
             </div>
@@ -382,15 +381,10 @@
     </div>
 
     <script>
-        // ==================== НАСТРОЙКИ JSONBIN (БЕСПЛАТНОЕ ОБЛАКО) ====================
-        // ЗАРЕГИСТРИРУЙТЕСЬ НА https://jsonbin.io И ВСТАВЬТЕ СВОИ ДАННЫЕ:
-        const JSONBIN_BIN_ID = "ваш_bin_id";      // Вставьте ваш Bin ID
-        const JSONBIN_API_KEY = "$2a$10$ваш_api_key"; // Вставьте ваш API Key
-        
+        // ==================== БАЗА ДАННЫХ ====================
         let isAdmin = false;
         let currentCategory = '';
         
-        // ==================== БАЗА ДАННЫХ ====================
         let database = {
             protein: { types: ["Сывороточный", "Казеиновый", "Яичный", "Соевый"], brands: ["MyProtein", "Optimum Nutrition", "RPS"], products: [] },
             creatine: { types: ["Моногидрат", "Гидрохлорид"], brands: ["MyProtein", "Creapure"], products: [] },
@@ -401,7 +395,7 @@
             gainer: { types: ["Высококалорийный", "Сбалансированный"], brands: ["Serious Mass", "Pro Complex"], products: [] }
         };
         
-        // ==================== СТАНДАРТНЫЕ ДАННЫЕ (ПРИ ПЕРВОМ ОТКРЫТИИ) ====================
+        // ==================== СТАНДАРТНЫЕ ДАННЫЕ ====================
         const defaultProducts = {
             protein: [
                 { id: "p1", type: "Сывороточный", brand: "MyProtein", name: "Impact Whey", weight: 1000, price: 3790, protein: 78, carbs: 5.5, fats: 5.2, rating: 5 },
@@ -412,42 +406,8 @@
             ]
         };
         
-        // ==================== ЗАГРУЗКА ИЗ ОБЛАКА ====================
-        async function loadFromCloud() {
-            if (!JSONBIN_BIN_ID || JSONBIN_BIN_ID === "ваш_bin_id") {
-                console.log("⚠️ JSONBin не настроен, используем локальное хранилище");
-                loadFromLocal();
-                return;
-            }
-            
-            try {
-                updateStatus("🔄 Загрузка из облака...");
-                const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-                    headers: { 'X-Master-Key': JSONBIN_API_KEY }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.record && data.record.database) {
-                        for (let cat in database) {
-                            if (data.record.database[cat] && data.record.database[cat].products) {
-                                database[cat].products = data.record.database[cat].products;
-                            }
-                        }
-                        updateStatus("✅ Данные загружены из облака");
-                        console.log("✅ Загружено из облака");
-                        return;
-                    }
-                }
-                loadFromLocal();
-            } catch (error) {
-                console.log("❌ Ошибка облака, используем локальные данные");
-                loadFromLocal();
-            }
-        }
-        
-        // ==================== ЗАГРУЗКА ИЗ LOCALSTORAGE ====================
-        function loadFromLocal() {
+        // ==================== ЗАГРУЗКА И СОХРАНЕНИЕ ====================
+        function loadData() {
             const saved = localStorage.getItem('sportnutrition_db');
             if (saved) {
                 try {
@@ -457,7 +417,7 @@
                             database[cat].products = parsed[cat].products || [];
                         }
                     }
-                    updateStatus("📀 Загружено из локального хранилища");
+                    updateStatus("📀 Данные загружены");
                 } catch(e) {}
             } else {
                 // Первый запуск — добавляем стандартные данные
@@ -466,74 +426,18 @@
                         database[cat].products = defaultProducts[cat];
                     }
                 }
-                saveToLocal();
+                saveData();
                 updateStatus("✨ Созданы стандартные данные");
             }
         }
         
-        // ==================== СОХРАНЕНИЕ В LOCALSTORAGE ====================
-        function saveToLocal() {
+        function saveData() {
             const toSave = {};
             for (let cat in database) {
                 toSave[cat] = { products: database[cat].products };
             }
             localStorage.setItem('sportnutrition_db', JSON.stringify(toSave));
-        }
-        
-        // ==================== СИНХРОНИЗАЦИЯ В ОБЛАКО ====================
-        async function syncToCloud() {
-            if (!isAdmin) {
-                alert("❌ Только администратор может синхронизировать");
-                return;
-            }
-            
-            if (!JSONBIN_BIN_ID || JSONBIN_BIN_ID === "ваш_bin_id") {
-                alert("⚠️ Облачная синхронизация не настроена!\n\nЗайдите на jsonbin.io, зарегистрируйтесь и вставьте Bin ID и API Key в код.");
-                return;
-            }
-            
-            try {
-                updateStatus("☁️ Синхронизация с облаком...");
-                const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': JSONBIN_API_KEY
-                    },
-                    body: JSON.stringify({ database: database })
-                });
-                
-                if (response.ok) {
-                    updateStatus("✅ Синхронизировано с облаком!");
-                    alert("✅ Данные сохранены в облако! Теперь они доступны на всех устройствах.");
-                } else {
-                    throw new Error("Ошибка сохранения");
-                }
-            } catch (error) {
-                updateStatus("❌ Ошибка синхронизации");
-                alert("❌ Ошибка синхронизации с облаком");
-            }
-        }
-        
-        // ==================== СОХРАНЕНИЕ (ЛОКАЛЬНО) ====================
-        function saveData() {
-            saveToLocal();
-            if (isAdmin && JSONBIN_BIN_ID && JSONBIN_BIN_ID !== "ваш_bin_id") {
-                syncToCloud();
-            }
-        }
-        
-        // ==================== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ====================
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-                tab.style.display = 'none';
-            });
-            const activeTab = document.getElementById('tab-' + tabName);
-            if (activeTab) {
-                activeTab.classList.add('active');
-                activeTab.style.display = 'block';
-            }
+            updateStatus("💾 Данные сохранены");
         }
         
         // ==================== ВЫБОР КАТЕГОРИИ ====================
@@ -606,11 +510,6 @@
         function showTable(category, subType, brand) {
             const headers = document.getElementById('tableHeaders');
             const body = document.getElementById('tableBody');
-            const adminActions = document.getElementById('adminActions');
-            
-            if (adminActions) {
-                adminActions.style.display = isAdmin ? 'table-cell' : 'none';
-            }
             
             headers.innerHTML = `
                 <th>№</th>
@@ -664,7 +563,6 @@
                 alert("✅ Вы вошли как администратор");
                 document.getElementById('adminForm').style.display = 'none';
                 document.getElementById('addBtn').style.display = 'inline-flex';
-                document.getElementById('syncBtn').style.display = 'inline-flex';
                 
                 const brand = document.getElementById('brandSelect').value;
                 if (brand) onBrandSelect();
@@ -812,13 +710,11 @@
         }
         
         // ==================== ЗАПУСК ====================
-        document.addEventListener('DOMContentLoaded', async function() {
-            await loadFromCloud();
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
             initTheme();
-            showTab('all');
             
             document.getElementById('addBtn').style.display = 'none';
-            document.getElementById('syncBtn').style.display = 'none';
         });
     </script>
 </body>
