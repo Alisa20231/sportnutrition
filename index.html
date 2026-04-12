@@ -206,8 +206,9 @@
             allProducts = data || [];
             updateFilters();
             displayProducts();
-            document.getElementById('statusText').innerHTML = `✅ ${allProducts.length} продуктов`;
-            document.getElementById('productCount').textContent = allProducts.length;
+            document.getElementById('statusText').innerHTML = `✅ Загружено ${allProducts.length} ${getProductWord(allProducts.length)}`;
+            const count = filtered.length;
+            document.getElementById('productCount').textContent = `${count} ${getProductWord(count)}`;
         }
     }
     
@@ -396,6 +397,15 @@
     window.onclick = function(event) {
         if (event.target === document.getElementById('addModal')) closeModal();
     };
+function getProductWord(count) {
+    if (count % 10 === 1 && count % 100 !== 11) {
+        return "продукт";
+    } else if (count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20)) {
+        return "продукта";
+    } else {
+        return "продуктов";
+    }
+}
     // ==================== ЭКСПОРТ В EXCEL ====================
 function exportToExcel() {
     if (allProducts.length === 0) {
