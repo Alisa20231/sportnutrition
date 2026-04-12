@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Спортивное питание | База данных</title>
+    <title>Спортивное питание | Общая база данных</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
@@ -54,10 +54,11 @@
             background: rgba(255,255,255,0.2);
             border: 1px solid rgba(255,255,255,0.3);
             color: white;
-            padding: 8px 16px;
+            padding: 8px 20px;
             border-radius: 25px;
             cursor: pointer;
             font-size: 14px;
+            font-weight: 600;
             transition: all 0.3s;
         }
         
@@ -68,13 +69,13 @@
         
         .admin-form {
             background: white;
-            padding: 20px;
-            border-radius: 12px;
+            padding: 25px;
+            border-radius: 15px;
             margin-top: 10px;
             display: none;
             position: absolute;
             right: 0;
-            width: 280px;
+            width: 300px;
             z-index: 100;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
@@ -82,28 +83,35 @@
         .admin-form h3 {
             margin-bottom: 15px;
             color: #333;
-            font-size: 16px;
+            font-size: 18px;
+            text-align: center;
         }
         
         .admin-form input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
             font-size: 14px;
+        }
+        
+        .admin-form input:focus {
+            outline: none;
+            border-color: #667eea;
         }
         
         .admin-form button {
             background: #667eea;
             color: white;
             border: none;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 10px;
             cursor: pointer;
             width: 100%;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
+            margin-top: 10px;
         }
         
         .admin-form button:hover {
@@ -193,7 +201,7 @@
         }
         
         .btn {
-            padding: 12px 24px;
+            padding: 12px 28px;
             border: none;
             border-radius: 10px;
             cursor: pointer;
@@ -222,23 +230,24 @@
             transform: translateY(-2px);
         }
         
-        .edit-btn, .delete-btn {
-            padding: 5px 10px;
-            margin: 0 3px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        
         .edit-btn {
             background: #f59e0b;
             color: white;
+            border: none;
+            padding: 5px 12px;
+            margin: 0 3px;
+            border-radius: 5px;
+            cursor: pointer;
         }
         
         .delete-btn {
             background: #ef4444;
             color: white;
+            border: none;
+            padding: 5px 12px;
+            margin: 0 3px;
+            border-radius: 5px;
+            cursor: pointer;
         }
         
         .edit-btn:hover, .delete-btn:hover {
@@ -271,7 +280,7 @@
             background: white;
             padding: 30px;
             border-radius: 20px;
-            width: 500px;
+            width: 550px;
             max-width: 90%;
             max-height: 80vh;
             overflow-y: auto;
@@ -280,15 +289,21 @@
         .modal-content h3 {
             margin-bottom: 20px;
             color: #333;
+            text-align: center;
         }
         
         .modal-content input, .modal-content select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 8px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
             font-size: 14px;
+        }
+        
+        .modal-content input:focus, .modal-content select:focus {
+            outline: none;
+            border-color: #667eea;
         }
         
         .form-row {
@@ -310,9 +325,10 @@
             flex: 1;
             padding: 12px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
+            font-size: 14px;
         }
         
         .modal-buttons button:first-child {
@@ -328,6 +344,15 @@
         .rating {
             color: #f59e0b;
         }
+        
+        .admin-badge {
+            background: #10b981;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -335,9 +360,9 @@
     <div class="header">
         <h1>🏋️‍♂️ БАЗА ДАННЫХ СПОРТИВНОГО ПИТАНИЯ</h1>
         <div class="admin-panel">
-            <button class="admin-toggle" id="adminToggleBtn">🔒 Админ-панель</button>
+            <button class="admin-toggle" id="adminToggleBtn">🔑 Админ-панель</button>
             <div class="admin-form" id="adminForm">
-                <h3>🔐 Вход для администратора</h3>
+                <h3>🔐 Вход администратора</h3>
                 <input type="password" id="adminPassword" placeholder="Введите пароль">
                 <button id="loginBtn">Войти</button>
             </div>
@@ -363,9 +388,9 @@
         </div>
         
         <div class="table-container">
-            <table id="dataTable">
+            <table>
                 <thead>
-                    <tr><th>Название</th><th>Категория</th><th>Тип</th><th>Бренд</th><th>Вес(г)</th><th>Цена(₽)</th><th>Белки</th><th>Жиры</th><th>Углеводы</th><th>Рейтинг</th><th>Действия</th></tr>
+                    <tr><th>Название</th><th>Категория</th><th>Тип</th><th>Бренд</th><th>Вес(г)</th><th>Цена(₽)</th><th>Белки</th><th>Жиры</th><th>Углеводы</th><th>Рейтинг</th><th id="actionsHeader">Действия</th></tr>
                 </thead>
                 <tbody id="tableBody">
                     <tr><td colspan="11" style="text-align:center; padding:40px;">🔄 Загрузка данных...</td></tr>
@@ -387,7 +412,7 @@
 
 <div id="addModal" class="modal">
     <div class="modal-content">
-        <h3>➕ ДОБАВИТЬ НОВЫЙ ПРОДУКТ</h3>
+        <h3>➕ НОВЫЙ ПРОДУКТ</h3>
         <input type="text" id="newName" placeholder="Название продукта *">
         <select id="newCategory">
             <option value="Протеины">🥛 Протеины</option>
@@ -396,16 +421,16 @@
             <option value="Жиросжигатели">🔥 Жиросжигатели</option>
             <option value="Гейнеры">⚖️ Гейнеры</option>
         </select>
-        <input type="text" id="newType" placeholder="Тип (Сывороточный, Моногидрат...)" value="Сывороточный">
-        <input type="text" id="newBrand" placeholder="Бренд" value="MyProtein">
+        <input type="text" id="newType" placeholder="Тип">
+        <input type="text" id="newBrand" placeholder="Бренд">
         <div class="form-row">
-            <input type="number" id="newWeight" placeholder="Вес (г)" value="1000">
-            <input type="number" id="newPrice" placeholder="Цена (₽)" value="3000">
+            <input type="number" id="newWeight" placeholder="Вес (г)">
+            <input type="number" id="newPrice" placeholder="Цена (₽)">
         </div>
         <div class="form-row">
-            <input type="number" step="0.1" id="newProtein" placeholder="Белки /100г" value="70">
-            <input type="number" step="0.1" id="newFats" placeholder="Жиры /100г" value="5">
-            <input type="number" step="0.1" id="newCarbs" placeholder="Углеводы /100г" value="10">
+            <input type="number" step="0.1" id="newProtein" placeholder="Белки /100г">
+            <input type="number" step="0.1" id="newFats" placeholder="Жиры /100г">
+            <input type="number" step="0.1" id="newCarbs" placeholder="Углеводы /100г">
         </div>
         <select id="newRating">
             <option value="5">⭐⭐⭐⭐⭐ Отлично</option>
@@ -422,8 +447,8 @@
 </div>
 
 <script>
-    // ==================== НАСТРОЙКИ SUPABASE ====================
-    // ЗАМЕНИТЕ ЭТИ ДАННЫЕ НА ВАШИ ИЗ SUPABASE:
+    // ==================== SUPABASE НАСТРОЙКИ ====================
+    // ЗАМЕНИТЕ ЭТИ ДАННЫЕ НА ВАШИ ИЗ SUPABASE!
     const SUPABASE_URL = "https://gfegddnmqtwamxlmxqba.supabase.co";      // ВАШ URL
     const SUPABASE_ANON_KEY = "sb_publishable_BQm4AqGZgqOQ5WLe26UR-g_BtES9KtI";                  // ВАШ КЛЮЧ
     
@@ -432,21 +457,19 @@
     let isAdmin = false;
     let allProducts = [];
     
-    // ==================== ПОДКЛЮЧЕНИЕ ====================
+    // ==================== ПОДКЛЮЧЕНИЕ К SUPABASE ====================
     try {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log("✅ Supabase подключен");
+        document.getElementById('statusText').innerHTML = '🔄 Подключение к Supabase...';
     } catch(e) {
         console.log("❌ Ошибка:", e);
-        document.getElementById('statusText').innerHTML = '❌ Ошибка подключения к Supabase';
+        document.getElementById('statusText').innerHTML = '❌ Ошибка подключения к Supabase. Проверьте URL и ключ.';
     }
     
     // ==================== ЗАГРУЗКА ИЗ SUPABASE ====================
     async function loadProducts() {
-        if (!supabase) {
-            document.getElementById('statusText').innerHTML = '⚠️ Supabase не настроен';
-            return;
-        }
+        if (!supabase) return;
         
         document.getElementById('statusText').innerHTML = '🔄 Загрузка из Supabase...';
         
@@ -456,16 +479,43 @@
             .order('id', { ascending: false });
         
         if (error) {
-            console.log("❌ Ошибка:", error);
+            console.log("❌ Ошибка загрузки:", error);
             document.getElementById('statusText').innerHTML = '❌ Ошибка: ' + error.message;
+            // Пробуем загрузить из localStorage
+            loadFromLocal();
         } else {
             allProducts = data || [];
+            console.log("✅ Загружено из Supabase:", allProducts.length);
             updateFilters();
             displayProducts();
             document.getElementById('statusText').innerHTML = `✅ Загружено ${allProducts.length} продуктов из Supabase`;
             document.getElementById('productCount').textContent = allProducts.length;
-            console.log("✅ Загружено:", allProducts.length);
         }
+    }
+    
+    // ==================== РЕЗЕРВНОЕ ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ====================
+    function loadFromLocal() {
+        const saved = localStorage.getItem('sportnutrition_products');
+        if (saved) {
+            allProducts = JSON.parse(saved);
+            updateFilters();
+            displayProducts();
+            document.getElementById('statusText').innerHTML = `📀 Загружено ${allProducts.length} продуктов (локально)`;
+            document.getElementById('productCount').textContent = allProducts.length;
+        } else {
+            // Стандартные данные
+            allProducts = [
+                { id: 1, name: "Impact Whey", category: "Протеины", type: "Сывороточный", brand: "MyProtein", weight: 1000, price: 3790, protein: 78, fats: 5.2, carbs: 5.5, rating: 5 },
+                { id: 2, name: "Gold Standard", category: "Протеины", type: "Сывороточный", brand: "Optimum Nutrition", weight: 2270, price: 5490, protein: 82, fats: 2, carbs: 4, rating: 5 },
+                { id: 3, name: "Creatine Monohydrate", category: "Креатин", type: "Моногидрат", brand: "MyProtein", weight: 500, price: 1190, protein: 0, fats: 0, carbs: 0, rating: 5 }
+            ];
+            saveToLocal();
+            displayProducts();
+        }
+    }
+    
+    function saveToLocal() {
+        localStorage.setItem('sportnutrition_products', JSON.stringify(allProducts));
     }
     
     // ==================== ОТОБРАЖЕНИЕ ТАБЛИЦЫ ====================
@@ -483,13 +533,18 @@
         tbody.innerHTML = '';
         
         if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:40px;">📭 Нет продуктов. Администратор может добавить. </td></tr>';
+            tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:40px;">📭 Нет продуктов</td></tr>';
+            document.getElementById('actionsHeader').style.display = 'none';
+            document.getElementById('productCount').textContent = '0';
             return;
         }
         
+        document.getElementById('actionsHeader').style.display = isAdmin ? 'table-cell' : 'none';
+        
         filtered.forEach(product => {
             const ratingStars = '⭐'.repeat(product.rating || 5);
-            const actions = isAdmin ? `<button class="edit-btn" onclick="editProduct(${product.id})">✏️</button> <button class="delete-btn" onclick="deleteProduct(${product.id})">🗑️</button>` : '';
+            const actions = isAdmin ? `<td><button class="edit-btn" onclick="editProduct(${product.id})">✏️</button> <button class="delete-btn" onclick="deleteProduct(${product.id})">🗑️</button></td>` : '<td></td>';
+            
             tbody.innerHTML += `
                 <tr>
                     <td>${product.name || ''}</td>
@@ -502,7 +557,7 @@
                     <td>${product.fats || 0} г</td>
                     <td>${product.carbs || 0} г</td>
                     <td class="rating">${ratingStars}</td>
-                    <td>${actions}</td>
+                    ${actions}
                 </tr>
             `;
         });
@@ -511,30 +566,25 @@
     }
     
     // ==================== ФИЛЬТРЫ ====================
-    function filterData() {
-        displayProducts();
-    }
-    
     function updateFilters() {
-        const types = new Set();
-        const brands = new Set();
-        
-        allProducts.forEach(p => {
-            if (p.type) types.add(p.type);
-            if (p.brand) brands.add(p.brand);
-        });
+        const types = [...new Set(allProducts.map(p => p.type).filter(t => t))];
+        const brands = [...new Set(allProducts.map(p => p.brand).filter(b => b))];
         
         const typeSelect = document.getElementById('typeFilter');
         typeSelect.innerHTML = '<option value="">📋 Все типы</option>';
-        Array.from(types).sort().forEach(t => {
+        types.sort().forEach(t => {
             typeSelect.innerHTML += `<option value="${t}">${t}</option>`;
         });
         
         const brandSelect = document.getElementById('brandFilter');
         brandSelect.innerHTML = '<option value="">🏷️ Все бренды</option>';
-        Array.from(brands).sort().forEach(b => {
+        brands.sort().forEach(b => {
             brandSelect.innerHTML += `<option value="${b}">${b}</option>`;
         });
+    }
+    
+    function filterData() {
+        displayProducts();
     }
     
     // ==================== АДМИН-ПАНЕЛЬ ====================
@@ -549,38 +599,51 @@
     
     function loginAdmin() {
         const password = document.getElementById('adminPassword').value;
+        
         if (password === "admin123") {
             isAdmin = true;
-            alert("✅ Вы вошли как администратор");
             document.getElementById('adminForm').style.display = 'none';
             document.getElementById('addBtn').style.display = 'inline-block';
             document.getElementById('adminPassword').value = '';
             displayProducts();
-            document.getElementById('statusText').innerHTML = "Режим администратора активен";
+            document.getElementById('statusText').innerHTML = "✅ Режим администратора активен";
+            alert("✅ Добро пожаловать! Теперь вы можете добавлять, редактировать и удалять продукты.");
         } else {
-            alert("❌ Неверный пароль");
+            alert("❌ Неверный пароль!");
             document.getElementById('adminPassword').value = '';
         }
     }
     
     // ==================== ДОБАВЛЕНИЕ В SUPABASE ====================
+    async function addProductToSupabase(product) {
+        if (!supabase) return false;
+        
+        const { data, error } = await supabase.from('products').insert([product]).select();
+        
+        if (error) {
+            console.log("❌ Ошибка добавления в Supabase:", error);
+            return false;
+        }
+        return true;
+    }
+    
     async function addProduct() {
         if (!isAdmin) {
-            alert("❌ Только администратор");
+            alert("❌ Только администратор может добавлять продукты");
             return;
         }
         
         const name = document.getElementById('newName').value.trim();
         if (!name) {
-            alert("Введите название продукта");
+            alert("Введите название продукта!");
             return;
         }
         
         const newProduct = {
             name: name,
             category: document.getElementById('newCategory').value,
-            type: document.getElementById('newType').value.trim(),
-            brand: document.getElementById('newBrand').value.trim(),
+            type: document.getElementById('newType').value.trim() || "Не указан",
+            brand: document.getElementById('newBrand').value.trim() || "Не указан",
             weight: parseInt(document.getElementById('newWeight').value) || 0,
             price: parseInt(document.getElementById('newPrice').value) || 0,
             protein: parseFloat(document.getElementById('newProtein').value) || 0,
@@ -591,61 +654,85 @@
         
         document.getElementById('statusText').innerHTML = '💾 Сохранение в Supabase...';
         
-        const { data, error } = await supabase.from('products').insert([newProduct]).select();
+        const success = await addProductToSupabase(newProduct);
         
-        if (error) {
-            alert("❌ Ошибка: " + error.message);
-            document.getElementById('statusText').innerHTML = '❌ Ошибка сохранения';
-        } else {
-            alert("✅ Продукт добавлен в Supabase!");
+        if (success) {
+            alert("✅ Продукт добавлен в облачную базу данных!");
             closeModal();
-            await loadProducts();
+            await loadProducts(); // Перезагружаем из Supabase
             clearForm();
+        } else {
+            alert("❌ Ошибка подключения к Supabase. Продукт сохранён локально.");
+            newProduct.id = Date.now();
+            allProducts.push(newProduct);
+            saveToLocal();
+            updateFilters();
+            displayProducts();
+            closeModal();
         }
     }
     
     function clearForm() {
         document.getElementById('newName').value = '';
-        document.getElementById('newType').value = 'Сывороточный';
-        document.getElementById('newBrand').value = 'MyProtein';
-        document.getElementById('newWeight').value = '1000';
-        document.getElementById('newPrice').value = '3000';
-        document.getElementById('newProtein').value = '70';
-        document.getElementById('newFats').value = '5';
-        document.getElementById('newCarbs').value = '10';
+        document.getElementById('newType').value = '';
+        document.getElementById('newBrand').value = '';
+        document.getElementById('newWeight').value = '';
+        document.getElementById('newPrice').value = '';
+        document.getElementById('newProtein').value = '';
+        document.getElementById('newFats').value = '';
+        document.getElementById('newCarbs').value = '';
     }
     
     // ==================== РЕДАКТИРОВАНИЕ ====================
     async function editProduct(id) {
         if (!isAdmin) return;
+        
         const product = allProducts.find(p => p.id === id);
         if (!product) return;
         
-        const newName = prompt("Новое название:", product.name);
+        const newName = prompt("Введите новое название:", product.name);
         if (!newName || newName === product.name) return;
         
-        const { error } = await supabase.from('products').update({ name: newName }).eq('id', id);
-        
-        if (error) {
-            alert("❌ Ошибка: " + error.message);
+        if (supabase) {
+            const { error } = await supabase.from('products').update({ name: newName }).eq('id', id);
+            if (error) {
+                alert("Ошибка: " + error.message);
+            } else {
+                alert("✅ Изменено в облаке!");
+                await loadProducts();
+            }
         } else {
-            alert("✅ Изменено");
-            await loadProducts();
+            product.name = newName;
+            saveToLocal();
+            displayProducts();
+            alert("✅ Изменено локально");
         }
     }
     
     // ==================== УДАЛЕНИЕ ====================
     async function deleteProduct(id) {
         if (!isAdmin) return;
-        if (!confirm("❓ Удалить этот продукт?")) return;
         
-        const { error } = await supabase.from('products').delete().eq('id', id);
+        const product = allProducts.find(p => p.id === id);
+        if (!product) return;
         
-        if (error) {
-            alert("❌ Ошибка: " + error.message);
+        if (!confirm(`❓ Удалить продукт "${product.name}"?`)) return;
+        
+        if (supabase) {
+            const { error } = await supabase.from('products').delete().eq('id', id);
+            if (error) {
+                alert("Ошибка: " + error.message);
+            } else {
+                alert("✅ Удалено из облака!");
+                await loadProducts();
+            }
         } else {
-            alert("✅ Продукт удалён");
-            await loadProducts();
+            const index = allProducts.findIndex(p => p.id === id);
+            allProducts.splice(index, 1);
+            saveToLocal();
+            updateFilters();
+            displayProducts();
+            alert("✅ Удалено локально");
         }
     }
     
@@ -660,26 +747,61 @@
     }
     
     function refreshData() {
-        loadProducts();
+        if (supabase) {
+            loadProducts();
+        } else {
+            loadFromLocal();
+        }
+    }
+    
+    // ==================== ЭКСПОРТ В EXCEL ====================
+    function exportToExcel() {
+        let csv = "Название;Категория;Тип;Бренд;Вес(г);Цена(₽);Белки(г);Жиры(г);Углеводы(г);Рейтинг\n";
+        allProducts.forEach(p => {
+            csv += `${p.name};${p.category};${p.type};${p.brand};${p.weight};${p.price};${p.protein};${p.fats};${p.carbs};${p.rating}\n`;
+        });
+        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `sportnutrition_${new Date().toISOString().slice(0,10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(link);
+        alert("✅ Данные выгружены в CSV");
     }
     
     // ==================== НАЗНАЧЕНИЕ ОБРАБОТЧИКОВ ====================
-    document.getElementById('adminToggleBtn').addEventListener('click', toggleAdminPanel);
-    document.getElementById('loginBtn').addEventListener('click', loginAdmin);
-    document.getElementById('addBtn').addEventListener('click', showAddForm);
-    document.getElementById('refreshBtn').addEventListener('click', refreshData);
-    document.getElementById('saveProductBtn').addEventListener('click', addProduct);
-    document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-    document.getElementById('categoryFilter').addEventListener('change', filterData);
-    document.getElementById('typeFilter').addEventListener('change', filterData);
-    document.getElementById('brandFilter').addEventListener('change', filterData);
+    document.getElementById('adminToggleBtn').onclick = toggleAdminPanel;
+    document.getElementById('loginBtn').onclick = loginAdmin;
+    document.getElementById('addBtn').onclick = showAddForm;
+    document.getElementById('refreshBtn').onclick = refreshData;
+    document.getElementById('saveProductBtn').onclick = addProduct;
+    document.getElementById('closeModalBtn').onclick = closeModal;
+    document.getElementById('categoryFilter').onchange = filterData;
+    document.getElementById('typeFilter').onchange = filterData;
+    document.getElementById('brandFilter').onchange = filterData;
     
-    window.addEventListener('click', (event) => {
-        if (event.target === document.getElementById('addModal')) closeModal();
-    });
+    // Добавляем кнопку экспорта
+    const actionsDiv = document.querySelector('.actions');
+    const exportBtn = document.createElement('button');
+    exportBtn.className = 'btn';
+    exportBtn.innerHTML = '📊 Экспорт в Excel';
+    exportBtn.style.background = '#f59e0b';
+    exportBtn.style.color = 'white';
+    exportBtn.onclick = exportToExcel;
+    actionsDiv.appendChild(exportBtn);
+    
+    window.onclick = function(event) {
+        const modal = document.getElementById('addModal');
+        if (event.target === modal) closeModal();
+    };
     
     // ==================== ЗАПУСК ====================
-    loadProducts();
+    if (supabase) {
+        loadProducts();
+    } else {
+        loadFromLocal();
+        document.getElementById('statusText').innerHTML = '⚠️ Supabase не настроен. Данные хранятся локально.';
+    }
 </script>
 </body>
 </html>
