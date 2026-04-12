@@ -249,27 +249,46 @@
     
     function filterData() { displayProducts(); }
     
-    // АДМИН-ПАНЕЛЬ
-    function toggleAdminPanel() {
-        const form = document.getElementById('adminForm');
-        form.style.display = form.style.display === 'block' ? 'none' : 'block';
+    // ==================== АДМИН-ПАНЕЛЬ ====================
+let isAdmin = false;
+
+function toggleAdminPanel() {
+    const form = document.getElementById('adminForm');
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+    } else {
+        form.style.display = 'none';
     }
+}
+
+function loginAdmin() {
+    const password = document.getElementById('adminPassword').value;
     
-    function loginAdmin() {
-        const password = document.getElementById('adminPassword').value;
-        if (password === "admin123") {
-            isAdmin = true;
-            document.getElementById('adminForm').style.display = 'none';
-            document.getElementById('addBtn').style.display = 'inline-block';
-            document.getElementById('adminPassword').value = '';
-            displayProducts();
-            document.getElementById('statusText').innerHTML = "✅ Режим администратора активен";
-            alert("✅ Вы вошли как администратор!");
-        } else {
-            alert("❌ Неверный пароль!");
-            document.getElementById('adminPassword').value = '';
-        }
+    if (password === "admin123") {
+        isAdmin = true;
+        document.getElementById('adminForm').style.display = 'none';
+        const addBtn = document.getElementById('addBtn');
+        if (addBtn) addBtn.style.display = 'inline-block';
+        document.getElementById('adminPassword').value = '';
+        
+        // Показываем кнопки действий в таблице
+        document.querySelectorAll('.delete-btn, .edit-btn').forEach(btn => {
+            btn.style.display = 'inline-block';
+        });
+        
+        alert("✅ Вы вошли как администратор!");
+        document.getElementById('statusText').innerHTML = "✅ Режим администратора активен";
+        
+        // Обновляем таблицу, чтобы показать кнопки действий
+        if (typeof displayProducts === 'function') displayProducts();
+    } else {
+        alert("❌ Неверный пароль! Пароль: admin123");
+        document.getElementById('adminPassword').value = '';
     }
+}
+
+document.getElementById('adminToggleBtn').onclick = toggleAdminPanel;
+document.getElementById('loginBtn').onclick = loginAdmin;
     
     // ДОБАВЛЕНИЕ
     async function addProduct() {
