@@ -382,47 +382,218 @@ const ADMIN_PASSWORD = "admin123"; // Пароль для администрат
 
 // База данных
 let database = {
-    protein: {
-        types: ["Сывороточный", "Казеиновый", "Яичный", "Соевый", "Комплексный"],
-        brands: ["Optimum Nutrition", "MyProtein", "RPS", "Dymatize", "BSN"],
-        products: []
-    },
-    creatine: {
-        types: ["Моногидрат", "Гидрохлорид", "Магниевый", "Этиловый эфир"],
-        brands: ["Creapure", "MyProtein", "MuscleTech", "Universal Nutrition"],
-        products: []
-    },
-    amino: {
-        types: ["BCAA", "EAA", "Глютамин", "Аргинин", "Таурин"],
-        brands: ["Scitec Nutrition", "Optimum Nutrition", "RPS", "BioTech USA"],
-        products: []
-    },
-    preworkout: {
-        types: ["Стимулирующий", "Нестимулирующий", "Для выносливости", "Для пампинга"],
-        brands: ["C4", "JYM", "Pre-Kaged", "Woke AF", "Total War"],
-        products: []
-    },
-    fatburner: {
-        types: ["Термогеник", "Липотропик", "Блокатор углеводов", "Блокатор жиров"],
-        brands: ["Hydroxycut", "Lipo-6", "Animal Cuts", "Clenbutrol"],
-        products: []
-    },
-    vitamins: {
-        types: ["Мультивитамины", "Витамины группы B", "Витамин D", "Минеральный комплекс"],
-        brands: ["Opti-Men", "Animal Pak", "NOW Foods", "Solgar"],
-        products: []
-    },
-    gainer: {
-        types: ["Высококалорийный", "Сбалансированный", "Протеиновый"],
-        brands: ["Serious Mass", "Pro Complex", "True-Mass", "Up Your Mass"],
-        products: []
-    },
-    other: {
-        types: ["Хондропротекторы", "Мелатонин", "Омега-3", "Изотоники"],
-        brands: ["Universal", "NOW Foods", "MyProtein", "Local"],
-        products: []
-    }
-};
+            // ==================== БАЗА ДАННЫХ С НАЧАЛЬНЫМИ ДАННЫМИ ====================
+        
+        // СТАНДАРТНЫЕ ДАННЫЕ (будут показаны при первом открытии на любом устройстве)
+        const defaultDatabase = {
+            protein: {
+                types: ["Сывороточный", "Казеиновый", "Яичный", "Соевый", "Комплексный"],
+                brands: ["MyProtein", "Optimum Nutrition", "RPS", "Dymatize", "BSN"],
+                products: [
+                    {
+                        id: "p1",
+                        type: "Сывороточный",
+                        brand: "MyProtein",
+                        name: "Impact Whey Protein",
+                        weight: 1000,
+                        price: 3790,
+                        protein: 78,
+                        carbs: 5.5,
+                        fats: 5.2,
+                        rating: 5
+                    },
+                    {
+                        id: "p2",
+                        type: "Сывороточный",
+                        brand: "Optimum Nutrition",
+                        name: "Gold Standard 100% Whey",
+                        weight: 2270,
+                        price: 5490,
+                        protein: 82,
+                        carbs: 4,
+                        fats: 2,
+                        rating: 5
+                    },
+                    {
+                        id: "p3",
+                        type: "Сывороточный",
+                        brand: "RPS",
+                        name: "Whey Pro",
+                        weight: 920,
+                        price: 2990,
+                        protein: 90,
+                        carbs: 1,
+                        fats: 1,
+                        rating: 4
+                    }
+                ]
+            },
+            creatine: {
+                types: ["Моногидрат", "Гидрохлорид", "Магниевый", "Этиловый эфир"],
+                brands: ["MyProtein", "Creapure", "MuscleTech", "Universal Nutrition"],
+                products: [
+                    {
+                        id: "c1",
+                        type: "Моногидрат",
+                        brand: "MyProtein",
+                        name: "Creatine Monohydrate",
+                        weight: 500,
+                        price: 1190,
+                        protein: 0,
+                        carbs: 0,
+                        fats: 0,
+                        rating: 5
+                    },
+                    {
+                        id: "c2",
+                        type: "Моногидрат",
+                        brand: "Creapure",
+                        name: "Creapure Creatine",
+                        weight: 300,
+                        price: 890,
+                        protein: 0,
+                        carbs: 0,
+                        fats: 0,
+                        rating: 5
+                    }
+                ]
+            },
+            amino: {
+                types: ["BCAA", "EAA", "Глютамин", "Аргинин", "Таурин"],
+                brands: ["Scitec Nutrition", "Optimum Nutrition", "RPS", "BioTech USA"],
+                products: [
+                    {
+                        id: "a1",
+                        type: "BCAA",
+                        brand: "Scitec Nutrition",
+                        name: "BCAA Xpress",
+                        weight: 400,
+                        price: 1790,
+                        protein: 0,
+                        carbs: 0,
+                        fats: 0,
+                        rating: 4
+                    },
+                    {
+                        id: "a2",
+                        type: "BCAA",
+                        brand: "MyProtein",
+                        name: "BCAA Powder",
+                        weight: 500,
+                        price: 1490,
+                        protein: 0,
+                        carbs: 0,
+                        fats: 0,
+                        rating: 4
+                    }
+                ]
+            },
+            preworkout: {
+                types: ["Стимулирующий", "Нестимулирующий", "Для выносливости", "Для пампинга"],
+                brands: ["C4", "JYM", "Pre-Kaged", "Woke AF", "Total War"],
+                products: [
+                    {
+                        id: "pw1",
+                        type: "Стимулирующий",
+                        brand: "RPS",
+                        name: "Pre-Workout",
+                        weight: 300,
+                        price: 2490,
+                        protein: 0,
+                        carbs: 2,
+                        fats: 0,
+                        rating: 4
+                    }
+                ]
+            },
+            fatburner: {
+                types: ["Термогеник", "Липотропик", "Блокатор углеводов", "Блокатор жиров"],
+                brands: ["Hydroxycut", "Lipo-6", "Animal Cuts", "Clenbutrol"],
+                products: []
+            },
+            vitamins: {
+                types: ["Мультивитамины", "Витамины группы B", "Витамин D", "Минеральный комплекс"],
+                brands: ["Optimum Nutrition", "Animal Pak", "NOW Foods", "Solgar"],
+                products: [
+                    {
+                        id: "v1",
+                        type: "Мультивитамины",
+                        brand: "Optimum Nutrition",
+                        name: "Opti-Men",
+                        weight: 180,
+                        price: 1890,
+                        protein: 0,
+                        carbs: 0,
+                        fats: 0,
+                        rating: 5
+                    }
+                ]
+            },
+            gainer: {
+                types: ["Высококалорийный", "Сбалансированный", "Протеиновый"],
+                brands: ["Serious Mass", "Pro Complex", "True-Mass", "Up Your Mass"],
+                products: []
+            },
+            other: {
+                types: ["Хондропротекторы", "Мелатонин", "Омега-3", "Изотоники"],
+                brands: ["Universal", "NOW Foods", "MyProtein", "Local"],
+                products: []
+            }
+        };
+        
+        // ЗАГРУЗКА ДАННЫХ (создаём стандартные, если нет сохранённых)
+        let database = {};
+        
+        function loadDatabase() {
+            const saved = localStorage.getItem('sportnutrition_database');
+            
+            if (saved) {
+                // Если есть сохранённые данные — загружаем их
+                database = JSON.parse(saved);
+                console.log("📀 Загружены сохранённые данные");
+            } else {
+                // Если данных нет — создаём стандартные
+                database = JSON.parse(JSON.stringify(defaultDatabase));
+                localStorage.setItem('sportnutrition_database', JSON.stringify(database));
+                console.log("📀 Созданы стандартные данные (первое открытие)");
+            }
+            return database;
+        }
+        
+        // СОХРАНЕНИЕ ДАННЫХ
+        function saveDatabase() {
+            localStorage.setItem('sportnutrition_database', JSON.stringify(database));
+            console.log("💾 Данные сохранены в localStorage");
+        }
+        
+        // ВЫГРУЗКА ДАННЫХ В EXCEL
+        function exportToExcel() {
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "Категория;Тип;Бренд;Название;Вес (г);Цена (₽);Белок;Углеводы;Жиры;Рейтинг\r\n";
+            
+            for (const [category, data] of Object.entries(database)) {
+                if (data.products && data.products.length > 0) {
+                    data.products.forEach(product => {
+                        csvContent += `${category};${product.type};${product.brand};${product.name};${product.weight};${product.price};${product.protein || 0};${product.carbs || 0};${product.fats || 0};${product.rating}\r\n`;
+                    });
+                }
+            }
+            
+            const link = document.createElement('a');
+            link.href = encodeURI(csvContent);
+            link.download = `sportnutrition_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+            
+            alert("✅ Данные выгружены в Excel (CSV файл)");
+        }
+        
+        // Загружаем данные при старте
+        database = loadDatabase();
+        
+        // Функция для обновления localStorage после изменений
+        function syncDatabase() {
+            saveDatabase();
+        }
 
 let isAdmin = false;
 let currentCategory = '';
