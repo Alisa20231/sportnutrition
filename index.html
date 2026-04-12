@@ -206,7 +206,7 @@
             allProducts = data || [];
             updateFilters();
             displayProducts();
-            document.getElementById('statusText').innerHTML = `✅ Загружено ${allProducts.length} ${getProductWord(allProducts.length)}`;
+            document.getElementById('statusText').innerHTML = `✅ ${allProducts.length} ${getProductWord(allProducts.length)}`;
             const count = filtered.length;
             document.getElementById('productCount').textContent = `${count} ${getProductWord(count)}`;
         }
