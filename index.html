@@ -16,11 +16,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
-            transition: all 0.4s ease;
-        }
-        
-        body.dark-theme {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         }
         
         .container {
@@ -30,11 +25,6 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.1);
             overflow: hidden;
-            transition: all 0.4s ease;
-        }
-        
-        body.dark-theme .container {
-            background: #1e293b;
         }
         
         .header {
@@ -43,10 +33,6 @@
             padding: 30px;
             text-align: center;
             position: relative;
-        }
-        
-        body.dark-theme .header {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
         }
         
         .header h1 {
@@ -63,29 +49,18 @@
             right: 20px;
         }
         
-        .theme-switcher {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-        }
-        
-        .admin-toggle, .theme-btn {
+        .admin-toggle {
             background: rgba(255,255,255,0.2);
             border: 1px solid rgba(255,255,255,0.3);
             color: white;
             padding: 8px 16px;
             border-radius: 25px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
             font-size: 14px;
         }
         
-        .admin-toggle:hover, .theme-btn:hover {
+        .admin-toggle:hover {
             background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
         }
         
         .admin-form {
@@ -101,18 +76,10 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
         
-        body.dark-theme .admin-form {
-            background: #334155;
-        }
-        
         .admin-form h3 {
             margin-bottom: 15px;
             color: #333;
             font-size: 16px;
-        }
-        
-        body.dark-theme .admin-form h3 {
-            color: white;
         }
         
         .admin-form input {
@@ -144,10 +111,6 @@
             margin-bottom: 30px;
         }
         
-        body.dark-theme .category-selector {
-            background: #0f172a;
-        }
-        
         .selector-group {
             margin-bottom: 20px;
         }
@@ -157,10 +120,6 @@
             margin-bottom: 8px;
             font-weight: 600;
             color: #333;
-        }
-        
-        body.dark-theme .selector-group label {
-            color: #e2e8f0;
         }
         
         .selector-group select {
@@ -173,10 +132,9 @@
             cursor: pointer;
         }
         
-        body.dark-theme .selector-group select {
-            background: #1e293b;
-            color: #e2e8f0;
-            border-color: #475569;
+        .selector-group select:focus {
+            outline: none;
+            border-color: #667eea;
         }
         
         .table-container {
@@ -197,28 +155,13 @@
             border-bottom: 2px solid #e0e0e0;
         }
         
-        body.dark-theme th {
-            background: #0f172a;
-            color: #e2e8f0;
-            border-bottom-color: #475569;
-        }
-        
         td {
             padding: 12px 15px;
             border-bottom: 1px solid #eee;
         }
         
-        body.dark-theme td {
-            border-bottom-color: #334155;
-            color: #cbd5e1;
-        }
-        
         tr:hover {
             background: #f5f5f5;
-        }
-        
-        body.dark-theme tr:hover {
-            background: #334155;
         }
         
         .status-bar {
@@ -229,10 +172,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        
-        body.dark-theme .status-bar {
-            background: #0f172a;
         }
         
         .product-count {
@@ -269,9 +208,9 @@
             color: white;
         }
         
-        .btn-success {
-            background: #10b981;
-            color: white;
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
         }
         
         .btn-danger {
@@ -279,9 +218,9 @@
             color: white;
         }
         
-        .btn:hover {
+        .btn-danger:hover {
+            background: #dc2626;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         
         .edit-btn, .delete-btn {
@@ -313,9 +252,6 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="theme-switcher">
-                <button class="theme-btn" id="themeToggle">🌙 Тёмная тема</button>
-            </div>
             <h1>🏋️‍♂️ БАЗА ДАННЫХ СПОРТИВНОГО ПИТАНИЯ</h1>
             <div class="admin-panel">
                 <button class="admin-toggle" onclick="toggleAdminPanel()">🔒 Админ-панель</button>
@@ -361,7 +297,7 @@
             <div class="table-container">
                 <table id="dataTable" style="display:none;">
                     <thead id="tableHeaders">
-                        <tr><th>№</th><th>Название</th><th>Вес(г)</th><th>Цена(₽)</th><th>Белок</th><th>Углеводы</th><th>Жиры</th><th>Рейтинг</th><th id="adminActions">Действия</th></tr>
+                        <tr><th>№</th><th>Название</th><th>Вес(г)</th><th>Цена(₽)</th><th>Белок</th><th>Углеводы</th><th>Жиры</th><th>Рейтинг</th><th>Действия</th></tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
                 </table>
@@ -376,6 +312,7 @@
                 <button class="btn btn-primary" id="addBtn" style="display:none;" onclick="addProduct()">➕ Добавить продукт</button>
                 <button class="btn" onclick="resetForm()">🔄 Сбросить форму</button>
                 <button class="btn" onclick="exportToExcel()">📊 Экспорт в Excel</button>
+                <button class="btn" onclick="importFromExcel()">📂 Импорт из Excel</button>
             </div>
         </div>
     </div>
@@ -386,20 +323,21 @@
         let currentCategory = '';
         
         let database = {
-            protein: { types: ["Сывороточный", "Казеиновый", "Яичный", "Соевый"], brands: ["MyProtein", "Optimum Nutrition", "RPS"], products: [] },
-            creatine: { types: ["Моногидрат", "Гидрохлорид"], brands: ["MyProtein", "Creapure"], products: [] },
-            amino: { types: ["BCAA", "EAA", "Глютамин"], brands: ["Scitec", "MyProtein"], products: [] },
-            preworkout: { types: ["Стимулирующий", "Нестимулирующий"], brands: ["RPS", "C4"], products: [] },
+            protein: { types: ["Сывороточный", "Казеиновый", "Яичный", "Соевый"], brands: ["MyProtein", "Optimum Nutrition", "RPS", "Dymatize"], products: [] },
+            creatine: { types: ["Моногидрат", "Гидрохлорид"], brands: ["MyProtein", "Creapure", "MuscleTech"], products: [] },
+            amino: { types: ["BCAA", "EAA", "Глютамин", "Аргинин"], brands: ["Scitec", "MyProtein", "Optimum Nutrition"], products: [] },
+            preworkout: { types: ["Стимулирующий", "Нестимулирующий"], brands: ["RPS", "C4", "JYM"], products: [] },
             fatburner: { types: ["Термогеник", "Липотропик"], brands: ["Hydroxycut", "Lipo-6"], products: [] },
-            vitamins: { types: ["Мультивитамины", "Витамины B"], brands: ["Optimum Nutrition", "NOW Foods"], products: [] },
+            vitamins: { types: ["Мультивитамины", "Витамины B", "Витамин D"], brands: ["Optimum Nutrition", "NOW Foods", "Solgar"], products: [] },
             gainer: { types: ["Высококалорийный", "Сбалансированный"], brands: ["Serious Mass", "Pro Complex"], products: [] }
         };
         
-        // ==================== СТАНДАРТНЫЕ ДАННЫЕ ====================
+        // ==================== СТАНДАРТНЫЕ ДАННЫЕ ДЛЯ ПРИМЕРА ====================
         const defaultProducts = {
             protein: [
                 { id: "p1", type: "Сывороточный", brand: "MyProtein", name: "Impact Whey", weight: 1000, price: 3790, protein: 78, carbs: 5.5, fats: 5.2, rating: 5 },
-                { id: "p2", type: "Сывороточный", brand: "Optimum Nutrition", name: "Gold Standard", weight: 2270, price: 5490, protein: 82, carbs: 4, fats: 2, rating: 5 }
+                { id: "p2", type: "Сывороточный", brand: "Optimum Nutrition", name: "Gold Standard", weight: 2270, price: 5490, protein: 82, carbs: 4, fats: 2, rating: 5 },
+                { id: "p3", type: "Казеиновый", brand: "MyProtein", name: "Casein", weight: 2500, price: 4190, protein: 80, carbs: 4, fats: 2, rating: 4 }
             ],
             creatine: [
                 { id: "c1", type: "Моногидрат", brand: "MyProtein", name: "Creatine Monohydrate", weight: 500, price: 1190, protein: 0, carbs: 0, fats: 0, rating: 5 }
@@ -417,18 +355,23 @@
                             database[cat].products = parsed[cat].products || [];
                         }
                     }
-                    updateStatus("📀 Данные загружены");
-                } catch(e) {}
-            } else {
-                // Первый запуск — добавляем стандартные данные
-                for (let cat in defaultProducts) {
-                    if (database[cat]) {
-                        database[cat].products = defaultProducts[cat];
-                    }
+                    updateStatus("📀 Данные загружены из локального хранилища");
+                } catch(e) {
+                    setDefaultData();
                 }
-                saveData();
-                updateStatus("✨ Созданы стандартные данные");
+            } else {
+                setDefaultData();
             }
+        }
+        
+        function setDefaultData() {
+            for (let cat in defaultProducts) {
+                if (database[cat]) {
+                    database[cat].products = defaultProducts[cat];
+                }
+            }
+            saveData();
+            updateStatus("✨ Созданы стандартные данные");
         }
         
         function saveData() {
@@ -438,6 +381,12 @@
             }
             localStorage.setItem('sportnutrition_db', JSON.stringify(toSave));
             updateStatus("💾 Данные сохранены");
+        }
+        
+        function updateStatus(message) {
+            const statusSpan = document.getElementById('statusText');
+            if (statusSpan) statusSpan.textContent = message;
+            console.log(message);
         }
         
         // ==================== ВЫБОР КАТЕГОРИИ ====================
@@ -469,7 +418,6 @@
             document.getElementById('dataTable').style.display = 'none';
         }
         
-        // ==================== ВЫБОР ТИПА ====================
         function onSubCategoryChange() {
             const category = currentCategory;
             const subType = document.getElementById('subCategory').value;
@@ -496,7 +444,6 @@
             document.getElementById('dataTable').style.display = 'none';
         }
         
-        // ==================== ВЫБОР БРЕНДА ====================
         function onBrandSelect() {
             const category = currentCategory;
             const subType = document.getElementById('subCategory').value;
@@ -566,6 +513,7 @@
                 
                 const brand = document.getElementById('brandSelect').value;
                 if (brand) onBrandSelect();
+                updateStatus("Режим администратора активен");
             } else {
                 alert("❌ Неверный пароль");
                 document.getElementById('adminPassword').value = '';
@@ -592,7 +540,11 @@
             if (!name) return;
             
             const weight = prompt("Вес (г):");
+            if (!weight) return;
+            
             const price = prompt("Цена (₽):");
+            if (!price) return;
+            
             const protein = prompt("Белок на 100г:");
             
             const newProduct = {
@@ -664,12 +616,12 @@
         
         // ==================== ЭКСПОРТ В EXCEL ====================
         function exportToExcel() {
-            let csv = "\uFEFFКатегория;Тип;Бренд;Название;Вес(г);Цена(₽);Белок;Рейтинг\n";
+            let csv = "\uFEFFКатегория;Тип;Бренд;Название;Вес(г);Цена(₽);Белок;Углеводы;Жиры;Рейтинг\n";
             
             for (const [cat, data] of Object.entries(database)) {
                 if (data.products && data.products.length > 0) {
                     data.products.forEach(p => {
-                        csv += `${cat};${p.type};${p.brand};${p.name};${p.weight};${p.price};${p.protein || 0};${p.rating}\n`;
+                        csv += `${cat};${p.type};${p.brand};${p.name};${p.weight};${p.price};${p.protein || 0};${p.carbs || 0};${p.fats || 0};${p.rating}\n`;
                     });
                 }
             }
@@ -686,34 +638,55 @@
             alert("✅ Данные выгружены в CSV");
         }
         
-        // ==================== ОБНОВЛЕНИЕ СТАТУСА ====================
-        function updateStatus(message) {
-            const statusSpan = document.getElementById('statusText');
-            if (statusSpan) statusSpan.textContent = message;
-            console.log(message);
-        }
-        
-        // ==================== ПЕРЕКЛЮЧЕНИЕ ТЕМ ====================
-        function initTheme() {
-            const saved = localStorage.getItem('theme');
-            if (saved === 'dark') {
-                document.body.classList.add('dark-theme');
-                document.getElementById('themeToggle').textContent = '☀️ Светлая тема';
-            }
-            
-            document.getElementById('themeToggle').addEventListener('click', () => {
-                document.body.classList.toggle('dark-theme');
-                const isDark = document.body.classList.contains('dark-theme');
-                localStorage.setItem('theme', isDark ? 'dark' : 'light');
-                document.getElementById('themeToggle').textContent = isDark ? '☀️ Светлая тема' : '🌙 Тёмная тема';
-            });
+        // ==================== ИМПОРТ ИЗ EXCEL ====================
+        function importFromExcel() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.csv';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const csv = event.target.result;
+                    const rows = csv.split('\n');
+                    
+                    // Пропускаем заголовок
+                    for (let i = 1; i < rows.length; i++) {
+                        if (rows[i].trim()) {
+                            const cols = rows[i].split(';');
+                            if (cols.length >= 9) {
+                                const category = cols[0];
+                                if (database[category]) {
+                                    const newProduct = {
+                                        id: Date.now() + i + Math.random(),
+                                        type: cols[1],
+                                        brand: cols[2],
+                                        name: cols[3],
+                                        weight: parseInt(cols[4]) || 0,
+                                        price: parseInt(cols[5]) || 0,
+                                        protein: parseInt(cols[6]) || 0,
+                                        carbs: parseInt(cols[7]) || 0,
+                                        fats: parseInt(cols[8]) || 0,
+                                        rating: parseInt(cols[9]) || 5
+                                    };
+                                    database[category].products.push(newProduct);
+                                }
+                            }
+                        }
+                    }
+                    
+                    saveData();
+                    alert("✅ Данные импортированы!");
+                    resetForm();
+                };
+                reader.readAsText(file, 'UTF-8');
+            };
+            input.click();
         }
         
         // ==================== ЗАПУСК ====================
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
-            initTheme();
-            
             document.getElementById('addBtn').style.display = 'none';
         });
     </script>
