@@ -272,25 +272,34 @@
     
     // АДМИН-ПАНЕЛЬ
     function toggleAdminPanel() {
-        const form = document.getElementById('adminForm');
-        form.style.display = form.style.display === 'block' ? 'none' : 'block';
-    }
-    
-    function loginAdmin() {
-        const password = document.getElementById('adminPassword').value;
-        if (password === "admin123") {
-            isAdmin = true;
-            alert("✅ Вы вошли как администратор");
-            document.getElementById('adminForm').style.display = 'none';
-            document.getElementById('addBtn').style.display = 'inline-block';
-            document.getElementById('adminPassword').value = '';
-            filterData();
-            document.getElementById('statusText').innerHTML = "Режим администратора активен";
+    const form = document.getElementById('adminForm');
+    if (form) {
+        if (form.style.display === 'none' || form.style.display === '') {
+            form.style.display = 'block';
         } else {
-            alert("❌ Неверный пароль");
-            document.getElementById('adminPassword').value = '';
+            form.style.display = 'none';
         }
+    } else {
+        alert("Элемент adminForm не найден!");
     }
+}
+
+function loginAdmin() {
+    const password = document.getElementById('adminPassword').value;
+    if (password === "admin123") {
+        window.isAdmin = true;
+        alert("✅ Вы вошли как администратор");
+        document.getElementById('adminForm').style.display = 'none';
+        document.getElementById('addBtn').style.display = 'inline-block';
+    } else {
+        alert("❌ Неверный пароль");
+    }
+}
+
+document.getElementById('adminToggleBtn').onclick = toggleAdminPanel;
+document.getElementById('loginBtn').onclick = loginAdmin;
+
+console.log("✅ Кнопки переопределены");
     
     // ДОБАВЛЕНИЕ В SUPABASE
     async function addProductToSupabase(product) {
