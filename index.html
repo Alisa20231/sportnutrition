@@ -264,8 +264,7 @@ function updateFilters() {
             updateFilters();
             displayProducts();
             document.getElementById('statusText').innerHTML = `✅ ${allProducts.length} ${getProductWord(allProducts.length)}`;
-            const count = filtered.length;
-            document.getElementById('productCount').textContent = `${count} ${getProductWord(count)}`;
+            document.getElementById('productCount').textContent = `${allProducts.length} ${getProductWord(allProducts.length)}`;
         }
     }
     
@@ -447,9 +446,15 @@ function updateFilters() {
     document.getElementById('refreshBtn').onclick = refreshData;
     document.getElementById('saveProductBtn').onclick = addProduct;
     document.getElementById('closeModalBtn').onclick = closeModal;
-    document.getElementById('categoryFilter').onchange = filterData;
-    document.getElementById('typeFilter').onchange = filterData;
-    document.getElementById('brandFilter').onchange = filterData;
+    document.getElementById('categoryFilter').onchange = function() {
+    updateAllFilters();
+    filterData();
+};
+document.getElementById('typeFilter').onchange = function() {
+    updateBrandFilter();
+    filterData();
+};
+document.getElementById('brandFilter').onchange = filterData;
     
     window.onclick = function(event) {
         if (event.target === document.getElementById('addModal')) closeModal();
@@ -536,7 +541,52 @@ function importFromExcel() {
 // НАЗНАЧЕНИЕ КНОПОК
 document.getElementById('exportExcelBtn').onclick = exportToExcel;
 document.getElementById('importExcelBtn').onclick = importFromExcel;
+    // ==================== ДОБАВЛЕННЫЕ ФУНКЦИИ ДЛЯ ФИЛЬТРАЦИИ ====================
+
+function updateTypeFilter() {
+    const selectedCategory = document.getElementById('categoryFilter').value;
+    const typeSelect = document.getElementById('typeFilter');
     
+    let uniqueTypes = [];
+    
+    if (selectedCategory) {
+        uniqueTypes = [...new Set(
+            allProducts
+                .filter(p => p.category === selectedCategory)
+                .map(p => p.type)
+                .filter(t => t)
+        )];
+    } else {
+        uniqueTypes = [...new Set(allProducts.map(p => p.type).filter(t => t))];
+    }
+    
+    typeSelect.innerHTML = '<option value="">📋 Все типы</option>';
+    uniqueTypes.sort().forEach(type => {
+        typeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+    });
+}
+
+function updateBrandFilter() {
+    const selectedCategory = document.getElementById('categoryFilter').value;
+    const selectedType = document.getElementById('typeFilter').value;
+    const brandSelect = document.getElementById('brandFilter');
+    
+    let filteredProducts = allProducts;
+    if (selectedCategory) filteredProducts = filteredProducts.filter(p => p.category === selectedCategory);
+    if (selectedType) filteredProducts = filteredProducts.filter(p => p.type === selectedType);
+    
+    const uniqueBrands = [...new Set(filteredProducts.map(p => p.brand).filter(b => b))];
+    
+    brandSelect.innerHTML = '<option value="">🏷️ Все бренды</option>';
+    uniqueBrands.sort().forEach(brand => {
+        brandSelect.innerHTML += `<option value="${brand}">${brand}</option>`;
+    });
+}
+
+function updateAllFilters() {
+    updateTypeFilter();
+    updateBrandFilter();
+}
     // ЗАПУСК
     loadProducts();
 </script>
