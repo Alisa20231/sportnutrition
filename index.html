@@ -82,7 +82,7 @@
         <div class="table-container">
             <table id="dataTable">
                 <thead>
-                    <tr><th>Название</th><th>Категория</th><th>Тип</th><th>Бренд</th><th>Вес(г)</th><th>Цена(₽)</th><th>Белки</th><th>Жиры</th><th>Углеводы</th><th>Рейтинг</th><th id="actionsHeader">Действия</th><tr>
+                    <tr><th>Название</th><th>Категория</th><th>Тип</th><th>Бренд</th><th>Вес(г)</th><th>Цена(₽)</th><th>Белки</th><th>Жиры</th><th>Углеводы</th><th>Рейтинг</th><th id="actionsHeader"></th><tr>
                 </thead>
                 <tbody id="tableBody">
                     <tr><td colspan="11" style="text-align:center; padding:40px;">🔄 Загрузка...</td></tr>
@@ -176,7 +176,63 @@
     let supabaseClient = null;
     let isAdmin = false;
     let allProducts = [];
+    // ==================== ОБНОВЛЕНИЕ ФИЛЬТРА ТИПОВ ПРИ ВЫБОРЕ КАТЕГОРИИ ====================
+function updateTypeFilter() {
+    const selectedCategory = document.getElementById('categoryFilter').value;
+    const typeSelect = document.getElementById('typeFilter');
     
+    // Собираем уникальные типы ТОЛЬКО для выбранной категории
+    let uniqueTypes = [];
+    
+    if (selectedCategory) {
+        // Фильтруем продукты по выбранной категории и собираем их типы
+        uniqueTypes = [...new Set(
+            allProducts
+                .filter(p => p.category === selectedCategory)
+                .map(p => p.type)
+                .filter(t => t)
+        )];
+    } else {
+        // Если категория не выбрана — показываем все типы из всех продуктов
+        uniqueTypes = [...new Set(allProducts.map(p => p.type).filter(t => t))];
+    }
+    
+    // Обновляем выпадающий список
+    typeSelect.innerHTML = '<option value="">📋 Все типы</option>';
+    uniqueTypes.sort().forEach(type => {
+        typeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+    });
+}
+
+// ==================== ОБНОВЛЕНИЕ ФИЛЬТРА БРЕНДОВ ПРИ ВЫБОРЕ КАТЕГОРИИ ====================
+function updateBrandFilter() {
+    const selectedCategory = document.getElementById('categoryFilter').value;
+    const selectedType = document.getElementById('typeFilter').value;
+    const brandSelect = document.getElementById('brandFilter');
+    
+    // Собираем уникальные бренды для выбранных фильтров
+    let filteredProducts = allProducts;
+    
+    if (selectedCategory) {
+        filteredProducts = filteredProducts.filter(p => p.category === selectedCategory);
+    }
+    if (selectedType) {
+        filteredProducts = filteredProducts.filter(p => p.type === selectedType);
+    }
+    
+    const uniqueBrands = [...new Set(filteredProducts.map(p => p.brand).filter(b => b))];
+    
+    // Обновляем выпадающий список
+    brandSelect.innerHTML = '<option value="">🏷️ Все бренды</option>';
+    uniqueBrands.sort().forEach(brand => {
+        brandSelect.innerHTML += `<option value="${brand}">${brand}</option>`;
+    });
+}
+
+// ==================== ОБНОВЛЕНИЕ ВСЕХ ФИЛЬТРОВ ====================
+function updateFilters() {
+    updateAllFilters();
+}
     // ПОДКЛЮЧЕНИЕ К SUPABASE
     if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -201,6 +257,7 @@
             console.log("❌ Ошибка:", error);
             document.getElementById('statusText').innerHTML = '❌ Ошибка: ' + error.message;
             allProducts = [];
+            updateAllFilters();
             displayProducts();
         } else {
             allProducts = data || [];
